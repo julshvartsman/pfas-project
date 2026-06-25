@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Who Bears the Burden? PFAS & Environmental Justice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <style>
+    :root {
+      --bg:        #0c0d10;
+      --surface:   #13151a;
+      --surface-2: #1a1d24;
+      --border:    #232630;
+      --border-2:  #2e3240;
+      --text:      #e4e6ed;
+      --text-2:    #9a9db0;
+      --text-sub:  #7a7d92;
+      --blue:      #4a7de0;
+      --blue-lo:   rgba(74,125,224,0.12);
+      --blue-mid:  rgba(74,125,224,0.22);
+      --blue-dim:  #1e2e5a;
+      --orange:    #e0724a;
+      --orange-lo: rgba(224,114,74,0.1);
+      --orange-dim:#5a2810;
+      --green:     #4db896;
+      --focus:     #f0c060;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .skip-nav {
+      position: absolute; top: -999px; left: 1rem; z-index: 9999;
+      background: var(--focus); color: #000; font-size: 0.85rem;
+      font-weight: 600; padding: 0.6rem 1rem; border-radius: 2px;
+      text-decoration: none;
+    }
+    .skip-nav:focus { top: 1rem; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Atmospheric tint — single, still, no animation */
+    .header-tint {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 55% 70% at 85% 50%, rgba(74,125,224,0.07) 0%, transparent 100%),
+        radial-gradient(ellipse 30% 50% at 10% 80%, rgba(224,114,74,0.05) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* US Map — rendered by D3 from real TopoJSON */
+    .header-map {
+      position: absolute;
+      right: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 480px;
+      pointer-events: none;
+      user-select: none;
+      overflow: visible;
+    }
+
+    .header-map svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .us-state {
+      fill: rgba(74, 125, 224, 0.12);
+      stroke: rgba(74, 125, 224, 0.4);
+      stroke-width: 0.5;
+      stroke-linejoin: round;
+    }
+
+    .us-nation {
+      fill: none;
+      stroke: rgba(74, 125, 224, 0.55);
+      stroke-width: 1;
+      stroke-linejoin: round;
+    }
+
+    /* Contamination point markers on the map */
+    .contam-ring {
+      fill: none;
+      stroke-width: 0.8;
+    }
+
+    .contam-dot { opacity: 0.75; }
+
+    .kicker {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .kicker::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--blue);
+      opacity: 0.6;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text);
+      max-width: 660px;
+      margin-bottom: 1.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    h1 span { font-style: italic; color: #c8cce0; }
+
+    .header-desc {
+      color: var(--text-2);
+      font-size: 0.93rem;
+      line-height: 1.75;
+      max-width: 480px;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    /* Stat strip */
+    .stat-strip {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      border-left: 2px solid var(--blue-dim);
+      padding-left: 0.85rem;
+    }
+
+    .stat-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12,13,16,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-tabs { display: flex; list-style: none; }
+
+    .nav-tabs button {
+      all: unset;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 1.25rem;
+      font-size: 0.84rem;
+      font-weight: 400;
+      color: var(--text-sub);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s;
+    }
+
+    .nav-tabs button:hover { color: var(--text-2); }
+
+    .nav-tabs button[aria-selected="true"] {
+      color: var(--text);
+      border-bottom-color: var(--blue);
+    }
+
+    .nav-num { font-size: 0.65rem; color: var(--text-sub); font-variant-numeric: tabular-nums; }
+
+    .nav-divider { width: 1px; height: 18px; background: var(--border); margin: 0 1.5rem; }
+
+    .nav-rq {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      font-style: italic;
+      font-family: 'DM Serif Display', serif;
+    }
+
+    /* ── CHAIN DIVIDER ── */
+    .chain-divider {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      overflow: hidden;
+      opacity: 0.3;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem 6rem;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+      align-items: start;
+    }
+
+    .section-eyebrow {
+      padding-top: 0.4rem;
+    }
+
+    .section-num {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .section-name {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    .section-right h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-right p {
+      color: var(--text-2);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      max-width: 580px;
+      font-weight: 300;
+    }
+
+    /* ── MAP ── */
+    .map-layout {
+      display: grid;
+      grid-template-columns: 1fr 210px;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .map-placeholder {
+      background: #080c16;
+      height: 500px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-center-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .map-center-content h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 0.35rem;
+    }
+
+    .map-center-content p {
+      font-size: 0.76rem;
+      color: var(--text-sub);
+      margin-bottom: 0.75rem;
+    }
+
+    .status-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      border: 1px solid var(--orange-dim);
+      border-radius: 2px;
+      padding: 0.22rem 0.6rem;
+    }
+
+    .map-sidebar {
+      background: var(--surface);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .sidebar-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control-group-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 0.5rem;
+    }
+
+    .radio-list { display: flex; flex-direction: column; gap: 0.22rem; }
+
+    .radio-opt {
+      all: unset;
+      cursor: pointer;
+      font-size: 0.74rem;
+      color: var(--text-sub);
+      padding: 0.32rem 0.5rem;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.1s;
+    }
+
+    .radio-opt::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-2);
+      flex-shrink: 0;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .radio-opt:hover { color: var(--text-2); }
+    .radio-opt.sel { color: var(--text); }
+    .radio-opt.sel::before { background: var(--blue); border-color: var(--blue); }
+
+    .legend-bar {
+      height: 6px;
+      border-radius: 1px;
+      background: linear-gradient(90deg, var(--blue), #8090b8, var(--orange));
+      margin: 0.5rem 0 0.3rem;
+    }
+
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+    }
+
+    /* ── INFO ROW ── */
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    .info-cell { background: var(--surface); padding: 1.1rem 1.25rem; }
+
+    .info-cell-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-cell p {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    /* ── VIZ ── */
+    .viz-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1px;
+    }
+
+    figure.viz-cell { background: var(--surface); padding: 1.25rem; margin: 0; }
+
+    .viz-cell-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .viz-cell-title { font-size: 0.82rem; font-weight: 500; color: var(--text); }
+    .viz-cell-type { font-size: 0.68rem; color: var(--text-sub); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+
+    .viz-area {
+      height: 155px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed var(--border-2);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+
+    .viz-area span { font-size: 0.75rem; color: var(--text-sub); }
+
+    figcaption.viz-summary {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      line-height: 1.6;
+      font-weight: 300;
+      font-style: italic;
+      border-top: 1px solid var(--border);
+      padding-top: 0.6rem;
+    }
+
+    /* scatter dots — size + color as redundant encoding */
+    .mock-scatter { width: 100%; height: 100%; position: relative; padding: 0.5rem; }
+    .s-dot { position: absolute; border-radius: 50%; }
+
+    .mock-bars { display: flex; align-items: flex-end; gap: 4px; width: 100%; height: 100%; padding: 0.5rem 0.5rem 0; }
+    .m-bar { flex: 1; border-radius: 1px 1px 0 0; }
+
+    /* ── TIMELINE ── */
+    .tl-wrap { padding: 2.5rem 0; }
+
+    .tl-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    dl.tl-items { display: grid; grid-template-columns: 80px 1fr; }
+    dl.tl-items > * { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+    dl.tl-items > *:last-child, dl.tl-items > *:nth-last-child(2) { border-bottom: none; }
+
+    dt.tl-year { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); font-variant-numeric: tabular-nums; padding-right: 1.5rem; }
+    dt.tl-year.hot { color: var(--orange); }
+
+    dd.tl-content { padding-left: 1.5rem; border-left: 2px solid var(--border); }
+    dd.tl-content strong { display: block; font-size: 0.84rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+    dd.tl-content p { font-size: 0.8rem; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+
+    /* ── SOURCES ── */
+    .sources-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .source-cell { background: var(--surface); padding: 1.25rem; }
+    .source-org { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 0.5rem; }
+    .source-name { font-size: 0.86rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; line-height: 1.3; }
+    .source-desc { font-size: 0.78rem; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+
+    /* ── NARRATIVE ── */
+    .pull-quote {
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .pull-quote blockquote {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      color: var(--text);
+      line-height: 1.55;
+      max-width: 720px;
+      margin-bottom: 0.75rem;
+    }
+
+    .pull-quote cite { font-size: 0.78rem; color: var(--text-sub); font-style: normal; }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    article.story-card { background: var(--surface); overflow: hidden; }
+
+    .story-img {
+      height: 120px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      padding: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .story-img-label { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 0.06em; text-transform: uppercase; position: relative; z-index: 1; }
+
+    .img-a { background: linear-gradient(135deg, #080e20 0%, #0f1e40 100%); }
+    .img-b { background: linear-gradient(135deg, #140806 0%, #2a1208 100%); }
+    .img-c { background: linear-gradient(135deg, #080b18 0%, #121830 100%); }
+
+    .story-body { padding: 1rem; }
+    .story-tag { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.4rem; }
+    .story-body h3 { font-size: 0.88rem; font-weight: 500; color: var(--text); margin-bottom: 0.35rem; line-height: 1.35; }
+    .story-body p { font-size: 0.78rem; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+
+    /* ── TEAM ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1px;
+    }
+
+    .team-cell { background: var(--surface); padding: 1.25rem; display: flex; gap: 0.85rem; align-items: flex-start; }
+
+    .avatar-initial {
+      width: 34px; height: 34px;
+      background: var(--blue-lo);
+      border: 1px solid var(--blue-dim);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .avatar-initial.orange { background: var(--orange-lo); border-color: var(--orange-dim); color: var(--orange); }
+
+    .team-name { font-size: 0.86rem; font-weight: 500; color: var(--text); margin-bottom: 0.15rem; }
+    .team-role { font-size: 0.74rem; color: var(--text-2); margin-bottom: 0.4rem; }
+
+    .comp-tag {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--blue);
+      border: 1px solid var(--blue-dim); border-radius: 2px;
+      padding: 0.15rem 0.45rem; display: inline-block;
+      background: var(--blue-lo);
+    }
+
+    .comp-tag.orange { color: var(--orange); border-color: var(--orange-dim); background: var(--orange-lo); }
+
+    /* ── LOG TABLE ── */
+    .log-wrap { border: 1px solid var(--border); }
+
+    .log-header-row {
+      display: flex; align-items: center; padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border); background: var(--surface);
+    }
+
+    .log-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-sub); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: var(--surface); }
+
+    thead th {
+      text-align: left; font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-sub);
+      padding: 0.65rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+    tbody td { padding: 0.7rem 1.25rem; color: var(--text-2); font-weight: 300; vertical-align: middle; }
+    tbody td:first-child { color: var(--text); font-weight: 400; }
+
+    .chip { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 2px; border: 1px solid; }
+    .chip-done     { color: var(--green);  border-color: rgba(77,184,150,0.3);  background: rgba(77,184,150,0.07); }
+    .chip-progress { color: var(--orange); border-color: rgba(224,114,74,0.3);  background: rgba(224,114,74,0.07); }
+    .chip-planned  { color: var(--text-sub); border-color: var(--border-2);     background: transparent; }
+
+    /* ── RQ BLOCK ── */
+    .rq-block {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+      padding: 2rem 2.5rem;
+      margin-top: 1px;
+      background: var(--surface);
+    }
+
+    .rq-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 0.75rem; }
+
+    .rq-text {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--text-2);
+      line-height: 1.55;
+      max-width: 680px;
+    }
+
+    .rq-text em { color: var(--text); font-style: normal; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2.5rem;
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left, .footer-right { font-size: 0.74rem; color: var(--text-sub); }
+
+    @media (max-width: 720px) {
+      .section-header { grid-template-columns: 1fr; }
+      .map-layout     { grid-template-columns: 1fr; }
+      .viz-row        { grid-template-columns: 1fr; }
+      .story-grid     { grid-template-columns: 1fr; }
+      .team-grid      { grid-template-columns: 1fr 1fr; }
+      .sources-row    { grid-template-columns: 1fr; }
+      .info-row       { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+<header>
+  <div class="header-tint" aria-hidden="true"></div>
+
+  <!-- US Map: rendered by D3 from real us-atlas TopoJSON -->
+  <div class="header-map" id="header-map" aria-hidden="true"></div>
+
+  <div class="header-inner">
+    <p class="kicker">Digital Humanities &nbsp;·&nbsp; Environmental Justice &nbsp;·&nbsp; 2026</p>
+    <h1>Who Bears the Burden of<br><span>PFAS Contamination</span><br>in America?</h1>
+    <p class="header-desc">
+      An intersectional investigation of per- and polyfluoroalkyl substance exposure
+      across race, class, rurality, and geography in US drinking water.
+      Three datasets. Three lenses. One structural question.
+    </p>
+    <div class="stat-strip">
+      <div class="stat">
+        <div class="stat-val">12,000+</div>
+        <div class="stat-label">Water systems tested</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">~45%</div>
+        <div class="stat-label">US tap water affected</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">80 yrs</div>
+        <div class="stat-label">Before federal MCL</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MOLECULAR CHAIN ═════════════════════════════════════════════ -->
+<!-- PFAS = perfluoroalkyl chain: repeating C backbone with F atoms branching off -->
+<div class="chain-divider" aria-hidden="true">
+  <svg viewBox="0 0 1080 36" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:36px;">
+    <line x1="0" y1="18" x2="1080" y2="18" stroke="#4a7de0" stroke-width="0.8"/>
+    <g stroke="#4a7de0" stroke-width="0.9" fill="none">
+      <!-- Carbon nodes every 54px, F branches above and below alternating -->
+      <circle cx="54"   cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="108"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="162"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="216"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="270"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="324"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="378"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="432"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="486"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="540"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="594"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="648"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="702"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="756"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="810"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="864"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="918"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="972"  cy="18" r="3.5" fill="#13151a"/>
+      <circle cx="1026" cy="18" r="3.5" fill="#13151a"/>
+      <!-- F up (odd nodes) -->
+      <line x1="54"   y1="14.5" x2="54"   y2="7"/><circle cx="54"   cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="162"  y1="14.5" x2="162"  y2="7"/><circle cx="162"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="270"  y1="14.5" x2="270"  y2="7"/><circle cx="270"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="378"  y1="14.5" x2="378"  y2="7"/><circle cx="378"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="486"  y1="14.5" x2="486"  y2="7"/><circle cx="486"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="594"  y1="14.5" x2="594"  y2="7"/><circle cx="594"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="702"  y1="14.5" x2="702"  y2="7"/><circle cx="702"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="810"  y1="14.5" x2="810"  y2="7"/><circle cx="810"  cy="5.5" r="2.2" fill="#13151a"/>
+      <line x1="918"  y1="14.5" x2="918"  y2="7"/><circle cx="918"  cy="5.5" r="2.2" fill="#13151a"/>
+      <!-- F down (even nodes) -->
+      <line x1="108"  y1="21.5" x2="108"  y2="29"/><circle cx="108"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="216"  y1="21.5" x2="216"  y2="29"/><circle cx="216"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="324"  y1="21.5" x2="324"  y2="29"/><circle cx="324"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="432"  y1="21.5" x2="432"  y2="29"/><circle cx="432"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="540"  y1="21.5" x2="540"  y2="29"/><circle cx="540"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="648"  y1="21.5" x2="648"  y2="29"/><circle cx="648"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="756"  y1="21.5" x2="756"  y2="29"/><circle cx="756"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="864"  y1="21.5" x2="864"  y2="29"/><circle cx="864"  cy="30.5" r="2.2" fill="#13151a"/>
+      <line x1="972"  y1="21.5" x2="972"  y2="29"/><circle cx="972"  cy="30.5" r="2.2" fill="#13151a"/>
+    </g>
+    <g font-family="monospace" font-size="5.5" fill="#4a7de0" text-anchor="middle" font-weight="600">
+      <text x="54"   y="4">F</text>
+      <text x="162"  y="4">F</text>
+      <text x="270"  y="4">F</text>
+      <text x="378"  y="4">F</text>
+      <text x="486"  y="4">F</text>
+      <text x="594"  y="4">F</text>
+      <text x="702"  y="4">F</text>
+      <text x="810"  y="4">F</text>
+      <text x="918"  y="4">F</text>
+      <text x="108"  y="36">F</text>
+      <text x="216"  y="36">F</text>
+      <text x="324"  y="36">F</text>
+      <text x="432"  y="36">F</text>
+      <text x="540"  y="36">F</text>
+      <text x="648"  y="36">F</text>
+      <text x="756"  y="36">F</text>
+      <text x="864"  y="36">F</text>
+      <text x="972"  y="36">F</text>
+    </g>
+  </svg>
+</div>
+
+<!-- ══ NAV ═════════════════════════════════════════════════════════ -->
+<nav aria-label="Project sections">
+  <div class="nav-inner">
+    <ul class="nav-tabs" role="tablist" aria-label="Project sections">
+      <li role="presentation">
+        <button role="tab" id="tab-btn-map" aria-selected="true" aria-controls="tab-map" onclick="switchTab('map',this)">
+          <span class="nav-num" aria-hidden="true">01</span> The Map
+        </button>
+      </li>
+      <li role="presentation">
+        <button role="tab" id="tab-btn-analysis" aria-selected="false" aria-controls="tab-analysis" onclick="switchTab('analysis',this)">
+          <span class="nav-num" aria-hidden="true">02</span> Analysis
+        </button>
+      </li>
+      <li role="presentation">
+        <button role="tab" id="tab-btn-narrative" aria-selected="false" aria-controls="tab-narrative" onclick="switchTab('narrative',this)">
+          <span class="nav-num" aria-hidden="true">03</span> Narrative
+        </button>
+      </li>
+      <li role="presentation">
+        <button role="tab" id="tab-btn-team" aria-selected="false" aria-controls="tab-team" onclick="switchTab('team',this)">
+          <span class="nav-num" aria-hidden="true">04</span> Team &amp; Log
+        </button>
+      </li>
+    </ul>
+    <div class="nav-divider" aria-hidden="true"></div>
+    <span class="nav-rq" aria-hidden="true">Who decided they would?</span>
+  </div>
+</nav>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════ -->
+<main id="main-content">
+
+  <!-- ── 01 MAP ── -->
+  <section id="tab-map" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-map" tabindex="0">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <div class="section-num">Component 01</div>
+        <div class="section-name">The Map</div>
+      </div>
+      <div class="section-right">
+        <h2>Interactive 3D Explorer</h2>
+        <p>A choropleth layer shades each geographic unit by demographic or vulnerability
+        profile on a blue → orange scale. 3D bars extrude from each boundary to encode
+        PFAS contamination — darker orange, taller bars signal communities carrying the
+        greatest burden with the fewest resources.</p>
+      </div>
+    </div>
+
+    <div class="map-layout">
+      <div class="map-placeholder" role="img" aria-label="3D contamination map placeholder, in development">
+        <!-- Contamination spread rings -->
+        <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+          <!-- Cluster 1 — midwest industrial -->
+          <circle cx="400" cy="220" r="8"   fill="#e0724a" fill-opacity="0.5"/>
+          <circle cx="400" cy="220" r="28"  fill="none" stroke="#e0724a" stroke-opacity="0.45" stroke-width="1.2"/>
+          <circle cx="400" cy="220" r="62"  fill="none" stroke="#e0724a" stroke-opacity="0.3"  stroke-width="0.9"/>
+          <circle cx="400" cy="220" r="108" fill="none" stroke="#c06030" stroke-opacity="0.2"  stroke-width="0.7"/>
+          <circle cx="400" cy="220" r="170" fill="none" stroke="#903020" stroke-opacity="0.12" stroke-width="0.5"/>
+          <!-- Cluster 2 — east coast -->
+          <circle cx="620" cy="175" r="6"   fill="#e0724a" fill-opacity="0.45"/>
+          <circle cx="620" cy="175" r="22"  fill="none" stroke="#e0724a" stroke-opacity="0.4"  stroke-width="1"/>
+          <circle cx="620" cy="175" r="52"  fill="none" stroke="#c06030" stroke-opacity="0.25" stroke-width="0.8"/>
+          <circle cx="620" cy="175" r="90"  fill="none" stroke="#903020" stroke-opacity="0.14" stroke-width="0.6"/>
+          <!-- Cluster 3 — west, blue (lower burden) -->
+          <circle cx="150" cy="240" r="5"   fill="#4a7de0" fill-opacity="0.4"/>
+          <circle cx="150" cy="240" r="18"  fill="none" stroke="#4a7de0" stroke-opacity="0.35" stroke-width="0.9"/>
+          <circle cx="150" cy="240" r="44"  fill="none" stroke="#3a60c0" stroke-opacity="0.2"  stroke-width="0.7"/>
+          <!-- Faint lat/lon grid -->
+          <line x1="0" y1="167" x2="800" y2="167" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
+          <line x1="0" y1="333" x2="800" y2="333" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
+          <line x1="267" y1="0" x2="267" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
+          <line x1="533" y1="0" x2="533" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
+        </svg>
+        <div class="map-center-content">
+          <h3>3D Contamination Map</h3>
+          <p>deck.gl · choropleth + extruded 3D bars · census-tract level</p>
+          <div class="status-tag">In Development</div>
+        </div>
+      </div>
+
+      <div class="map-sidebar" aria-label="Map layer controls">
+        <div class="sidebar-label">Layer Controls</div>
+        <div>
+          <div class="control-group-label" id="ctrl-choropleth">Choropleth Variable</div>
+          <div class="radio-list" role="group" aria-labelledby="ctrl-choropleth">
+            <button class="radio-opt sel" aria-pressed="true">% People of Color</button>
+            <button class="radio-opt" aria-pressed="false">Median Household Income</button>
+            <button class="radio-opt" aria-pressed="false">SVI Composite Score</button>
+            <button class="radio-opt" aria-pressed="false">% Below Poverty Line</button>
+            <button class="radio-opt" aria-pressed="false">% Rural Population</button>
+          </div>
+        </div>
+        <div>
+          <div class="control-group-label" id="ctrl-geo">Geographic Unit</div>
+          <div class="radio-list" role="group" aria-labelledby="ctrl-geo">
+            <button class="radio-opt sel" aria-pressed="true">Census Tract</button>
+            <button class="radio-opt" aria-pressed="false">County</button>
+            <button class="radio-opt" aria-pressed="false">State</button>
+          </div>
+        </div>
+        <div>
+          <div class="control-group-label">Color Scale</div>
+          <div class="legend-bar" role="img" aria-label="Gradient from blue (lower burden) to orange (higher burden)"></div>
+          <div class="legend-labels" aria-hidden="true"><span>Lower burden</span><span>Higher burden</span></div>
+        </div>
+        <div>
+          <div class="control-group-label" id="ctrl-bar">Bar Height</div>
+          <div class="radio-list" role="group" aria-labelledby="ctrl-bar">
+            <button class="radio-opt sel" aria-pressed="true">Max detection (ppt)</button>
+            <button class="radio-opt" aria-pressed="false">Sum of detections</button>
+            <button class="radio-opt" aria-pressed="false">Detection count</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-cell">
+        <div class="info-cell-label">Reading the map</div>
+        <p>Each unit shaded by chosen demographic variable. 3D bars encode PFAS contamination simultaneously — darker orange rising high marks the most burdened communities.</p>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">Data pipeline</div>
+        <p>EPA ECHO measurements spatially joined to ACS geometries. Filtered to confirmed detections in public water systems, aggregated to the selected geographic unit.</p>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">Redundant encoding</div>
+        <p>Color and bar height are two independent signals — so colorblind users can read contamination levels from height alone without relying on hue.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 ANALYSIS ── -->
+  <section id="tab-analysis" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-analysis" tabindex="0">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <div class="section-num">Component 02</div>
+        <div class="section-name">The Record</div>
+      </div>
+      <div class="section-right">
+        <h2>Data &amp; Analysis</h2>
+        <p>A guided walkthrough pairing a timeline of PFAS spread with interactive exploratory
+        visualizations — scatter plots, detection trends, and demographic breakdowns that surface
+        the patterns underlying contamination data.</p>
+      </div>
+    </div>
+
+    <div class="viz-row">
+      <figure class="viz-cell">
+        <div class="viz-cell-header">
+          <span class="viz-cell-title">PFAS Concentration vs. % People of Color</span>
+          <span class="viz-cell-type">Scatter</span>
+        </div>
+        <div class="viz-area" role="img" aria-label="Scatter plot showing positive correlation between PFAS levels and proportion of people of color. Dots progress from blue (low burden) to orange (high burden), with size also encoding contamination level.">
+          <div class="mock-scatter" aria-hidden="true">
+            <div class="s-dot" style="left:7%;top:78%;background:#4a7de0;opacity:.55;width:5px;height:5px;"></div>
+            <div class="s-dot" style="left:13%;top:64%;background:#5588e0;opacity:.55;width:5px;height:5px;"></div>
+            <div class="s-dot" style="left:20%;top:70%;background:#5a8cd8;opacity:.5;width:6px;height:6px;"></div>
+            <div class="s-dot" style="left:27%;top:56%;background:#6898d0;opacity:.55;width:6px;height:6px;"></div>
+            <div class="s-dot" style="left:34%;top:60%;background:#78a0c8;opacity:.5;width:6px;height:6px;"></div>
+            <div class="s-dot" style="left:41%;top:46%;background:#8898b8;opacity:.55;width:7px;height:7px;"></div>
+            <div class="s-dot" style="left:48%;top:50%;background:#a07868;opacity:.5;width:7px;height:7px;"></div>
+            <div class="s-dot" style="left:55%;top:36%;background:#b86850;opacity:.55;width:8px;height:8px;"></div>
+            <div class="s-dot" style="left:62%;top:40%;background:#c86848;opacity:.55;width:8px;height:8px;"></div>
+            <div class="s-dot" style="left:69%;top:26%;background:#d06040;opacity:.6;width:9px;height:9px;"></div>
+            <div class="s-dot" style="left:76%;top:30%;background:#d8684a;opacity:.6;width:9px;height:9px;"></div>
+            <div class="s-dot" style="left:83%;top:18%;background:#e0724a;opacity:.65;width:10px;height:10px;"></div>
+            <div class="s-dot" style="left:89%;top:22%;background:#e0724a;opacity:.65;width:11px;height:11px;"></div>
+          </div>
+        </div>
+        <figcaption class="viz-summary">
+          Expected finding: census tracts with higher proportions of people of color show elevated PFAS detection levels — consistent with environmental justice literature on disproportionate contamination burden.
+        </figcaption>
+      </figure>
+
+      <figure class="viz-cell">
+        <div class="viz-cell-header">
+          <span class="viz-cell-title">PFAS Detections Over Time (2016–2024)</span>
+          <span class="viz-cell-type">Bar Chart</span>
+        </div>
+        <div class="viz-area" role="img" aria-label="Bar chart showing PFAS detections rising sharply from 2016 to 2024, from blue to orange encoding temporal progression.">
+          <div class="mock-bars" aria-hidden="true">
+            <div class="m-bar" style="height:16%;background:#1a3060;"></div>
+            <div class="m-bar" style="height:20%;background:#1e3870;"></div>
+            <div class="m-bar" style="height:26%;background:#244080;"></div>
+            <div class="m-bar" style="height:24%;background:#2a4888;"></div>
+            <div class="m-bar" style="height:40%;background:#345898;"></div>
+            <div class="m-bar" style="height:50%;background:#3e68a8;"></div>
+            <div class="m-bar" style="height:58%;background:#602010;"></div>
+            <div class="m-bar" style="height:68%;background:#782818;"></div>
+            <div class="m-bar" style="height:77%;background:#8e3020;"></div>
+            <div class="m-bar" style="height:85%;background:#a83c28;"></div>
+            <div class="m-bar" style="height:90%;background:#be4c34;"></div>
+            <div class="m-bar" style="height:96%;background:#e0724a;"></div>
+          </div>
+        </div>
+        <figcaption class="viz-summary">
+          Detection counts have risen sharply since 2016, reflecting both expanded testing requirements and wider contamination spread. Steepest increases follow the PFAS Strategic Roadmap (2022).
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="viz-row">
+      <figure class="viz-cell">
+        <div class="viz-cell-header">
+          <span class="viz-cell-title">Contamination by Income Quartile</span>
+          <span class="viz-cell-type">Box Plot</span>
+        </div>
+        <div class="viz-area"><span>Visualization coming soon</span></div>
+        <figcaption class="viz-summary">Will show median and spread of PFAS detection levels across four income quartiles, testing whether lower-income tracts face systematically higher contamination.</figcaption>
+      </figure>
+
+      <figure class="viz-cell">
+        <div class="viz-cell-header">
+          <span class="viz-cell-title">SVI Composite Score vs. Max PFAS Detection</span>
+          <span class="viz-cell-type">Regression</span>
+        </div>
+        <div class="viz-area"><span>Visualization coming soon</span></div>
+        <figcaption class="viz-summary">Will plot CDC SVI scores against maximum PFAS detection, with a regression line testing whether social vulnerability predicts contamination exposure.</figcaption>
+      </figure>
+    </div>
+
+    <div class="tl-wrap">
+      <div class="tl-label">Regulatory Timeline</div>
+      <dl class="tl-items">
+        <dt class="tl-year">1940s</dt>
+        <dd class="tl-content"><strong>Industrial synthesis begins</strong><p>3M develops PFOS; DuPont patents PTFE (Teflon). Widespread manufacturing adoption. Early internal toxicity data suppressed from public and regulators.</p></dd>
+
+        <dt class="tl-year">1998</dt>
+        <dd class="tl-content"><strong>Internal evidence shared with EPA</strong><p>3M data reveals PFOS accumulates in human blood globally. No public disclosure follows. Voluntary phase-out negotiated years later — no enforcement.</p></dd>
+
+        <dt class="tl-year hot">2001–06</dt>
+        <dd class="tl-content"><strong>C8 Health Project, Parkersburg WV</strong><p>DuPont's Teflon plant linked to elevated cancer rates in surrounding community. Predominantly low-income and rural. Class-action settlement with no admission of liability.</p></dd>
+
+        <dt class="tl-year hot">2016</dt>
+        <dd class="tl-content"><strong>First EPA health advisory — non-binding</strong><p>Lifetime advisory set at 70 ppt combined PFOA+PFOS. Voluntary only. No enforcement mechanism. Communities with contaminated systems receive no legal recourse.</p></dd>
+
+        <dt class="tl-year">2022</dt>
+        <dd class="tl-content"><strong>PFAS Strategic Roadmap</strong><p>EPA commits to binding Maximum Contaminant Levels. Decades of advocacy from contaminated communities precede this commitment.</p></dd>
+
+        <dt class="tl-year hot">2024</dt>
+        <dd class="tl-content"><strong>First federal MCL established</strong><p>EPA sets MCL at 4 ppt for PFOA and PFOS — 80 years after these compounds entered widespread production. Compliance required by 2029.</p></dd>
+      </dl>
+    </div>
+
+    <div class="sources-row">
+      <div class="source-cell">
+        <div class="source-org">EPA · ECHO</div>
+        <div class="source-name">PFAS Analytic Tools</div>
+        <p class="source-desc">Live contamination measurements from public water systems nationwide. Basis for all PFAS exposure variables in this analysis.</p>
+      </div>
+      <div class="source-cell">
+        <div class="source-org">U.S. Census Bureau</div>
+        <div class="source-name">ACS 5-Year Estimates, 2020–2024</div>
+        <p class="source-desc">Demographic estimates at census tract level: race, income, poverty, age structure, rurality. Joined geographically to water system service areas.</p>
+      </div>
+      <div class="source-cell">
+        <div class="source-org">CDC / ATSDR</div>
+        <div class="source-name">Social Vulnerability Index, 2022</div>
+        <p class="source-desc">Composite burden indices across four themes: socioeconomic status, household characteristics, racial/ethnic minority status, and housing type.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 NARRATIVE ── -->
+  <section id="tab-narrative" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-narrative" tabindex="0">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <div class="section-num">Component 03</div>
+        <div class="section-name">The Stories</div>
+      </div>
+      <div class="section-right">
+        <h2>Human &amp; Community Impact</h2>
+        <p>Quantitative patterns placed in human context. Integrating toxicological research,
+        community testimony, and the social history of regulatory neglect to trace who decided
+        which communities would carry this burden — and how that decision was made.</p>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      <blockquote>"The question is not whether PFAS is dangerous — the science settled that decades ago. The question is why some communities waited 80 years for the government to act, while the industry that profited faced no accountability."</blockquote>
+      <cite>Framing premise for this section</cite>
+    </div>
+
+    <div class="story-grid">
+      <article class="story-card">
+        <div class="story-img img-b" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Toxicology</p>
+          <h3>What PFAS Does to the Body</h3>
+          <p>A synthesis of epidemiological research on health outcomes: kidney and testicular cancer, thyroid disruption, immunotoxicity, and developmental impacts in children.</p>
+        </div>
+      </article>
+      <article class="story-card">
+        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Community</p>
+          <h3>Parkersburg, WV: The Original PFAS Town</h3>
+          <p>Where DuPont dumped PFOA into groundwater for decades. A working-class community bore health consequences while corporate knowledge was buried inside proprietary research.</p>
+        </div>
+      </article>
+      <article class="story-card">
+        <div class="story-img img-c" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Regulatory History</p>
+          <h3>The Decades-Long Regulatory Gap</h3>
+          <p>Industry lobbying, voluntary agreements, and EPA inaction left communities — disproportionately communities of color — without enforceable protections for a generation.</p>
+        </div>
+      </article>
+      <article class="story-card">
+        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Military Communities</p>
+          <h3>AFFF Contamination Near Military Bases</h3>
+          <p>Aqueous film-forming foam used at installations saturated surrounding groundwater — often low-income communities of color with little political leverage.</p>
+        </div>
+      </article>
+      <article class="story-card">
+        <div class="story-img img-b" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Rural Exposure</p>
+          <h3>Small Systems, Fewer Resources</h3>
+          <p>Rural water systems frequently lack capital and staffing to detect and remediate PFAS — placing rural residents in compound vulnerability with no recourse.</p>
+        </div>
+      </article>
+      <article class="story-card">
+        <div class="story-img img-c" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+        <div class="story-body">
+          <p class="story-tag">Policy</p>
+          <h3>What the 2024 MCL Changes (and Doesn't)</h3>
+          <p>The first federal standard arrived 80 years after contamination began. What it covers, what it excludes, and which communities still have no recourse.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── 04 TEAM & LOG ── -->
+  <section id="tab-team" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-team" tabindex="0">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <div class="section-num">Team &amp; Log</div>
+        <div class="section-name">All components</div>
+      </div>
+      <div class="section-right">
+        <h2>Project Members &amp; Progress</h2>
+        <p>Six contributors across three project components. All members are responsible for tracking work progress published on this documentation log.</p>
+      </div>
+    </div>
+
+    <div class="team-grid">
+      <div class="team-cell">
+        <div class="avatar-initial" aria-hidden="true">A</div>
+        <div><div class="team-name">Aadil</div><div class="team-role">Map Design &amp; Development</div><span class="comp-tag">The Map</span></div>
+      </div>
+      <div class="team-cell">
+        <div class="avatar-initial" aria-hidden="true">J</div>
+        <div><div class="team-name">Julia</div><div class="team-role">Map Design &amp; Development</div><span class="comp-tag">The Map</span></div>
+      </div>
+      <div class="team-cell">
+        <div class="avatar-initial" aria-hidden="true">S</div>
+        <div><div class="team-name">Sophia Ma</div><div class="team-role">Data Narrative &amp; Analysis</div><span class="comp-tag">The Record</span></div>
+      </div>
+      <div class="team-cell">
+        <div class="avatar-initial" aria-hidden="true">P</div>
+        <div><div class="team-name">Paulina</div><div class="team-role">Data Narrative &amp; Analysis</div><span class="comp-tag">The Record</span></div>
+      </div>
+      <div class="team-cell">
+        <div class="avatar-initial orange" aria-hidden="true">E</div>
+        <div><div class="team-name">Ethan</div><div class="team-role">Human &amp; Community Impact</div><span class="comp-tag orange">The Stories</span></div>
+      </div>
+      <div class="team-cell">
+        <div class="avatar-initial orange" aria-hidden="true">O</div>
+        <div><div class="team-name">Owen</div><div class="team-role">Human &amp; Community Impact</div><span class="comp-tag orange">The Stories</span></div>
+      </div>
+    </div>
+
+    <div class="log-wrap">
+      <div class="log-header-row"><span class="log-title" id="log-caption">Documentation Log</span></div>
+      <table aria-labelledby="log-caption">
+        <thead>
+          <tr>
+            <th scope="col" style="width:42%">Task</th>
+            <th scope="col">Owner(s)</th>
+            <th scope="col">Component</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Data acquisition — EPA PFAS measurements</td><td>All</td><td>Data</td><td><span class="chip chip-done">Done</span></td></tr>
+          <tr><td>ACS demographic data pull &amp; cleaning</td><td>All</td><td>Data</td><td><span class="chip chip-done">Done</span></td></tr>
+          <tr><td>Geographic join (PFAS → census tracts)</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>deck.gl 3D map implementation</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-planned">Planned</span></td></tr>
+          <tr><td>Choropleth layer + controls UI</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-planned">Planned</span></td></tr>
+          <tr><td>Exploratory scatter plots &amp; trend charts</td><td>Sophia, Paulina</td><td>Analysis</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>PFAS timeline &amp; regulatory history</td><td>Sophia, Paulina</td><td>Analysis</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>Toxicology synthesis &amp; community profiles</td><td>Ethan, Owen</td><td>Stories</td><td><span class="chip chip-planned">Planned</span></td></tr>
+          <tr><td>Narrative writing &amp; editorial review</td><td>Ethan, Owen</td><td>Stories</td><td><span class="chip chip-planned">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rq-block">
+      <div class="rq-label">Research Question</div>
+      <p class="rq-text">
+        <em>Who bears the burden of PFAS contamination in America,</em>
+        and who decided they would? Examined through the intersection of race,
+        class, rurality, and the structural history of regulatory inaction —
+        grounded in Bullard (1990) and the environmental justice tradition.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="footer-left">Data: EPA ECHO · U.S. Census Bureau ACS · CDC/ATSDR SVI 2022 · All sources publicly available</span>
+  <span class="footer-right">Digital Humanities, 2026</span>
+</footer>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => { p.classList.remove('active'); p.setAttribute('tabindex', '-1'); });
+    document.querySelectorAll('.nav-tabs button').forEach(b => b.setAttribute('aria-selected', 'false'));
+    document.getElementById('tab-' + id).classList.add('active');
+    document.getElementById('tab-' + id).setAttribute('tabindex', '0');
+    btn.setAttribute('aria-selected', 'true');
+  }
+
+  document.querySelector('.nav-tabs').addEventListener('keydown', e => {
+    const tabs = [...document.querySelectorAll('.nav-tabs button')];
+    const idx = tabs.indexOf(document.activeElement);
+    if (idx === -1) return;
+    if (e.key === 'ArrowRight') { tabs[(idx + 1) % tabs.length].focus(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); e.preventDefault(); }
+  });
+
+  document.querySelectorAll('.radio-list').forEach(list => {
+    list.querySelectorAll('.radio-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        list.querySelectorAll('.radio-opt').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
+        btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
+      });
+    });
+  });
+
+  // ── US MAP via D3 + real TopoJSON ──────────────────────────────
+  // Fetches the actual US state boundaries from us-atlas and renders
+  // them with an Albers USA projection — the standard for US thematic maps.
+  (async function renderUSMap() {
+    const container = document.getElementById('header-map');
+    if (!container) return;
+
+    const W = 480, H = 300;
+
+    const svg = d3.select(container)
+      .append('svg')
+      .attr('viewBox', `0 0 ${W} ${H}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet');
+
+    const projection = d3.geoAlbersUsa()
+      .fitSize([W, H], { type: 'Sphere' })
+      .translate([W / 2, H / 2])
+      .scale(620);
+
+    const path = d3.geoPath().projection(projection);
+
+    try {
+      const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+      const states = topojson.feature(us, us.objects.states);
+      const nation  = topojson.mesh(us, us.objects.states, (a, b) => a === b); // outer boundary
+
+      // State fills
+      svg.append('g')
+        .selectAll('path')
+        .data(states.features)
+        .join('path')
+        .attr('class', 'us-state')
+        .attr('d', path);
+
+      // Outer nation boundary
+      svg.append('path')
+        .datum(nation)
+        .attr('class', 'us-nation')
+        .attr('d', path);
+
+      // Contamination hotspot markers — approximate lat/lon for known PFAS clusters
+      // These are real approximate locations: midwest industrial, NC/SC, Great Lakes
+      const hotspots = [
+        { name: 'Ohio/Indiana (3M industrial)',  coords: [-84.5, 39.8],  color: '#e0724a', r: 3.5 },
+        { name: 'NC/SC (Chemours/GenX)',          coords: [-78.9, 34.5],  color: '#e0724a', r: 3   },
+        { name: 'Cape Fear, NC',                  coords: [-78.2, 35.1],  color: '#e0724a', r: 2.5 },
+        { name: 'Great Lakes region',             coords: [-86.2, 42.0],  color: '#e0724a', r: 2.5 },
+        { name: 'Parkersburg, WV (DuPont)',       coords: [-81.6, 39.3],  color: '#e0724a', r: 4   },
+        { name: 'Colorado Springs (AFFF)',        coords: [-104.8, 38.8], color: '#4a7de0', r: 2.5 },
+        { name: 'New England (manufacturing)',    coords: [-71.5, 42.4],  color: '#e0724a', r: 2   },
+      ];
+
+      hotspots.forEach(({ coords, color, r }) => {
+        const projected = projection(coords);
+        if (!projected) return;
+        const [x, y] = projected;
+
+        // Spread rings
+        [r * 5, r * 11, r * 20].forEach((radius, i) => {
+          svg.append('circle')
+            .attr('cx', x).attr('cy', y)
+            .attr('r', radius)
+            .attr('class', 'contam-ring')
+            .attr('stroke', color)
+            .attr('stroke-opacity', 0.22 - i * 0.06);
+        });
+
+        // Center dot
+        svg.append('circle')
+          .attr('cx', x).attr('cy', y)
+          .attr('r', r)
+          .attr('class', 'contam-dot')
+          .attr('fill', color);
+      });
+
+    } catch (e) {
+      // Silently fail — map is decorative, content remains accessible
+      container.remove();
+    }
+  })();
+</script>
+
+</body>
+</html>
