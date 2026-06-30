@@ -868,55 +868,33 @@
     </div>
 
     <div class="map-layout">
-      <div class="map-placeholder" role="img" aria-label="3D contamination map placeholder, in development">
-        <!-- Contamination spread rings -->
-        <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-          <!-- Cluster 1 — midwest industrial -->
-          <circle cx="400" cy="220" r="8"   fill="#e0724a" fill-opacity="0.5"/>
-          <circle cx="400" cy="220" r="28"  fill="none" stroke="#e0724a" stroke-opacity="0.45" stroke-width="1.2"/>
-          <circle cx="400" cy="220" r="62"  fill="none" stroke="#e0724a" stroke-opacity="0.3"  stroke-width="0.9"/>
-          <circle cx="400" cy="220" r="108" fill="none" stroke="#c06030" stroke-opacity="0.2"  stroke-width="0.7"/>
-          <circle cx="400" cy="220" r="170" fill="none" stroke="#903020" stroke-opacity="0.12" stroke-width="0.5"/>
-          <!-- Cluster 2 — east coast -->
-          <circle cx="620" cy="175" r="6"   fill="#e0724a" fill-opacity="0.45"/>
-          <circle cx="620" cy="175" r="22"  fill="none" stroke="#e0724a" stroke-opacity="0.4"  stroke-width="1"/>
-          <circle cx="620" cy="175" r="52"  fill="none" stroke="#c06030" stroke-opacity="0.25" stroke-width="0.8"/>
-          <circle cx="620" cy="175" r="90"  fill="none" stroke="#903020" stroke-opacity="0.14" stroke-width="0.6"/>
-          <!-- Cluster 3 — west, blue (lower burden) -->
-          <circle cx="150" cy="240" r="5"   fill="#4a7de0" fill-opacity="0.4"/>
-          <circle cx="150" cy="240" r="18"  fill="none" stroke="#4a7de0" stroke-opacity="0.35" stroke-width="0.9"/>
-          <circle cx="150" cy="240" r="44"  fill="none" stroke="#3a60c0" stroke-opacity="0.2"  stroke-width="0.7"/>
-          <!-- Faint lat/lon grid -->
-          <line x1="0" y1="167" x2="800" y2="167" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
-          <line x1="0" y1="333" x2="800" y2="333" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
-          <line x1="267" y1="0" x2="267" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
-          <line x1="533" y1="0" x2="533" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
-        </svg>
-        <div class="map-center-content">
-          <h3>3D Contamination Map</h3>
-          <p>deck.gl · choropleth + extruded 3D bars · census-tract level</p>
-          <div class="status-tag">In Development</div>
-        </div>
+      <div class="map-placeholder">
+        <iframe id="map-frame" title="PFAS contamination map"
+                src="maps/map_all-time_pct_nonwhite_both.html"
+                style="width:100%;height:100%;border:0;display:block;"
+                loading="lazy" allow="fullscreen"></iframe>
       </div>
 
       <div class="map-sidebar" aria-label="Map layer controls">
         <div class="sidebar-label">Layer Controls</div>
         <div>
           <div class="control-group-label" id="ctrl-choropleth">Choropleth Variable</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-choropleth">
-            <button class="radio-opt sel" aria-pressed="true">% People of Color</button>
-            <button class="radio-opt" aria-pressed="false">Median Household Income</button>
-            <button class="radio-opt" aria-pressed="false">SVI Composite Score</button>
-            <button class="radio-opt" aria-pressed="false">% Below Poverty Line</button>
-            <button class="radio-opt" aria-pressed="false">% Rural Population</button>
+          <div class="radio-list" id="var-list" role="group" aria-labelledby="ctrl-choropleth">
+            <button class="radio-opt sel" aria-pressed="true"  data-var="pct_nonwhite">% People of Color</button>
+            <button class="radio-opt" aria-pressed="false" data-var="pct_below_poverty">% Below Poverty</button>
+            <button class="radio-opt" aria-pressed="false" data-var="median_hh_income">Median Household Income</button>
+            <button class="radio-opt" aria-pressed="false" data-var="pct_hispanic">% Hispanic</button>
+            <button class="radio-opt" aria-pressed="false" data-var="pct_black_nh">% Black</button>
+            <button class="radio-opt" aria-pressed="false" data-var="pct_asian_nh">% Asian</button>
+            <button class="radio-opt" aria-pressed="false" data-var="total_pop">Total Population</button>
           </div>
         </div>
         <div>
-          <div class="control-group-label" id="ctrl-geo">Geographic Unit</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-geo">
-            <button class="radio-opt sel" aria-pressed="true">Census Tract</button>
-            <button class="radio-opt" aria-pressed="false">County</button>
-            <button class="radio-opt" aria-pressed="false">State</button>
+          <div class="control-group-label" id="ctrl-mode">Map Layers</div>
+          <div class="radio-list" id="mode-list" role="group" aria-labelledby="ctrl-mode">
+            <button class="radio-opt sel" aria-pressed="true"  data-mode="both">Choropleth + bars</button>
+            <button class="radio-opt" aria-pressed="false" data-mode="choropleth">Choropleth only</button>
+            <button class="radio-opt" aria-pressed="false" data-mode="bars">Bars only</button>
           </div>
         </div>
         <div>
@@ -925,11 +903,10 @@
           <div class="legend-labels" aria-hidden="true"><span>Lower burden</span><span>Higher burden</span></div>
         </div>
         <div>
-          <div class="control-group-label" id="ctrl-bar">Bar Height</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-bar">
-            <button class="radio-opt sel" aria-pressed="true">Max detection (ppt)</button>
-            <button class="radio-opt" aria-pressed="false">Sum of detections</button>
-            <button class="radio-opt" aria-pressed="false">Detection count</button>
+          <div class="control-group-label">Bar Height &amp; Markers</div>
+          <div class="legend-labels" style="display:block;color:var(--text-sub);font-size:0.72rem;line-height:1.55;">
+            Bars: mean PFAS (ng/L) per ZCTA. Red rings mark the ZCTAs with the highest
+            demographic &times; PFAS overlap.
           </div>
         </div>
       </div>
@@ -1255,14 +1232,30 @@
     if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); e.preventDefault(); }
   });
 
+  function updateMap() {
+    const frame = document.getElementById('map-frame');
+    if (!frame) return;
+    const varBtn  = document.querySelector('#var-list .radio-opt.sel');
+    const modeBtn = document.querySelector('#mode-list .radio-opt.sel');
+    const v = varBtn  ? varBtn.dataset.var   : 'pct_nonwhite';
+    const m = modeBtn ? modeBtn.dataset.mode : 'both';
+    // bars-only is identical across variables -> one shared file
+    const src = (m === 'bars')
+      ? 'maps/map_all-time_total_pop_bars.html'
+      : 'maps/map_all-time_' + v + '_' + m + '.html';
+    if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
+  }
+
   document.querySelectorAll('.radio-list').forEach(list => {
     list.querySelectorAll('.radio-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         list.querySelectorAll('.radio-opt').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
+        updateMap();
       });
     });
   });
+  updateMap();
 
   // ── US MAP via D3 + real TopoJSON ──────────────────────────────
   // Fetches the actual US state boundaries from us-atlas and renders
