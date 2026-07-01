@@ -744,22 +744,16 @@
     }
 
     article.story-card { background: var(--surface); overflow: hidden; }
-
-    .story-img {
-      height: 120px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-end;
-      padding: 0.75rem;
+    article.story-card {
       position: relative;
-      overflow: hidden;
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     }
 
-    .story-img-label { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 0.06em; text-transform: uppercase; position: relative; z-index: 1; }
-
-    .img-a { background: linear-gradient(135deg, #080e20 0%, #0f1e40 100%); }
-    .img-b { background: linear-gradient(135deg, #140806 0%, #2a1208 100%); }
-    .img-c { background: linear-gradient(135deg, #080b18 0%, #121830 100%); }
+    article.story-card.story-active {
+      background: var(--surface-2);
+      box-shadow: inset 0 0 0 1px rgba(224,114,74,0.45), 0 0 28px rgba(224,114,74,0.12);
+      transform: translateY(-2px);
+    }
 
     .story-body { padding: 1rem; }
     .story-tag { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.4rem; }
@@ -815,6 +809,46 @@
     }
 
     .story-card.expanded .read-more-btn::after { content: '-'; }
+
+    .story-rotator-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1px;
+      padding: 0.85rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--text-2);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .story-rotator-note strong {
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .story-pips {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .story-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--border-2);
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .story-pip.active {
+      background: var(--orange);
+      transform: scale(1.25);
+    }
 
     /* ── TEAM ── */
     .team-grid {
@@ -1416,9 +1450,18 @@
       </article>
     </div>
 
+    <div class="story-rotator-note" aria-live="polite">
+      <span><strong id="story-spotlight-label">Spotlight: Visualizing Burden</strong> rotates through the case studies. Each story includes a small location cue to keep the geography in view.</span>
+      <div class="story-pips" aria-hidden="true">
+        <span class="story-pip active"></span>
+        <span class="story-pip"></span>
+        <span class="story-pip"></span>
+        <span class="story-pip"></span>
+      </div>
+    </div>
+
     <div class="story-grid">
-      <article class="story-card">
-        <div class="story-img img-b" aria-hidden="true"><span class="story-img-label">Newburgh, NY</span></div>
+      <article class="story-card story-active" data-story-title="Visualizing Burden">
         <div class="story-body">
           <p class="story-tag">Visualizing Burden</p>
           <h3>Newburgh, New York</h3>
@@ -1432,8 +1475,7 @@
           </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Industry Documents</span></div>
+      <article class="story-card" data-story-title="Visualizing Cost">
         <div class="story-body">
           <p class="story-tag">Visualizing Cost</p>
           <h3>3M, DuPont, and Withheld Knowledge</h3>
@@ -1447,8 +1489,7 @@
           </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-c" aria-hidden="true"><span class="story-img-label">Marinette, WI</span></div>
+      <article class="story-card" data-story-title="Visualizing Negligence">
         <div class="story-body">
           <p class="story-tag">Visualizing Negligence</p>
           <h3>Marinette, Wisconsin</h3>
@@ -1462,8 +1503,7 @@
           </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Hoosick Falls, NY</span></div>
+      <article class="story-card" data-story-title="Visualizing Accountability">
         <div class="story-body">
           <p class="story-tag">Visualizing Accountability</p>
           <h3>Hoosick Falls, New York</h3>
@@ -1615,12 +1655,34 @@
     if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); e.preventDefault(); }
   });
 
+  const storyCards = [...document.querySelectorAll('.story-card')];
+  const storyPips = [...document.querySelectorAll('.story-pip')];
+  const storySpotlightLabel = document.getElementById('story-spotlight-label');
+  let activeStoryIndex = 0;
+
+  function setStorySpotlight(index) {
+    if (!storyCards.length) return;
+    activeStoryIndex = (index + storyCards.length) % storyCards.length;
+    storyCards.forEach((card, i) => card.classList.toggle('story-active', i === activeStoryIndex));
+    storyPips.forEach((pip, i) => pip.classList.toggle('active', i === activeStoryIndex));
+    if (storySpotlightLabel) {
+      storySpotlightLabel.textContent = 'Spotlight: ' + storyCards[activeStoryIndex].dataset.storyTitle;
+    }
+  }
+
+  setStorySpotlight(0);
+  window.setInterval(() => {
+    if (!document.querySelector('.story-card.expanded')) setStorySpotlight(activeStoryIndex + 1);
+  }, 5200);
+
   document.querySelectorAll('.read-more-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const card = btn.closest('.story-card');
       const expanded = card.classList.toggle('expanded');
       btn.setAttribute('aria-expanded', String(expanded));
       btn.firstChild.textContent = expanded ? 'Show less' : 'Read more';
+      const index = storyCards.indexOf(card);
+      if (index !== -1) setStorySpotlight(index);
     });
   });
 
