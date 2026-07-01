@@ -810,46 +810,6 @@
 
     .story-card.expanded .read-more-btn::after { content: '-'; }
 
-    .story-rotator-note {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1px;
-      padding: 0.85rem 1rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      color: var(--text-2);
-      font-size: 0.78rem;
-      line-height: 1.5;
-      font-weight: 300;
-    }
-
-    .story-rotator-note strong {
-      color: var(--orange);
-      font-weight: 700;
-    }
-
-    .story-pips {
-      display: flex;
-      gap: 0.4rem;
-      flex-shrink: 0;
-    }
-
-    .story-pip {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--border-2);
-      transition: background 0.3s ease, transform 0.3s ease;
-    }
-
-    .story-pip.active {
-      background: var(--orange);
-      transform: scale(1.25);
-    }
-
     /* ── TEAM ── */
     .team-grid {
       display: grid;
@@ -1450,16 +1410,6 @@
       </article>
     </div>
 
-    <div class="story-rotator-note" aria-live="polite">
-      <span><strong id="story-spotlight-label">Spotlight: Visualizing Burden</strong> rotates through the case studies. Each story includes a small location cue to keep the geography in view.</span>
-      <div class="story-pips" aria-hidden="true">
-        <span class="story-pip active"></span>
-        <span class="story-pip"></span>
-        <span class="story-pip"></span>
-        <span class="story-pip"></span>
-      </div>
-    </div>
-
     <div class="story-grid">
       <article class="story-card story-active" data-story-title="Visualizing Burden">
         <div class="story-body">
@@ -1656,18 +1606,12 @@
   });
 
   const storyCards = [...document.querySelectorAll('.story-card')];
-  const storyPips = [...document.querySelectorAll('.story-pip')];
-  const storySpotlightLabel = document.getElementById('story-spotlight-label');
   let activeStoryIndex = 0;
 
   function setStorySpotlight(index) {
     if (!storyCards.length) return;
     activeStoryIndex = (index + storyCards.length) % storyCards.length;
     storyCards.forEach((card, i) => card.classList.toggle('story-active', i === activeStoryIndex));
-    storyPips.forEach((pip, i) => pip.classList.toggle('active', i === activeStoryIndex));
-    if (storySpotlightLabel) {
-      storySpotlightLabel.textContent = 'Spotlight: ' + storyCards[activeStoryIndex].dataset.storyTitle;
-    }
   }
 
   setStorySpotlight(0);
