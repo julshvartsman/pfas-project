@@ -5,3 +5,4 @@ requests
 pyarrow
 pydeck
 geopandas
+topojson

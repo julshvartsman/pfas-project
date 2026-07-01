@@ -1,0 +1,36 @@
+{
+  "generated_utc": "2026-07-01T18:13:51+00:00",
+  "source": "EPA PFAS Analytic Tools -- Drinking Water (UCMR) layer",
+  "source_url": "https://awsedap.epa.gov/public/extensions/PFAS_Tools/PFAS_Tools.html",
+  "access_method": "Downloaded from the PFAS Analytic Tools (Drinking Water UCMR tab)",
+  "kind": "nondetect",
+  "nondetect_substitution": "0",
+  "filter_note": "Downloaded in two halves (detections / non-detections) to stay under Excel's ~1.05M-row cap; detection status is per-row from 'Result At or Above UCMR MRL'. Concatenate the two parquets downstream.",
+  "download_date": "FILL_ME_IN",
+  "version_note": "UCMR 5 is revised quarterly through fall 2026; treat as versioned.",
+  "source_file": "nondetects.xlsx",
+  "output_parquet": "nondetects_nondetect.parquet",
+  "rows_total": 995517,
+  "detections": 0,
+  "non_detections": 995517,
+  "cycles": {
+    "UCMR 5 (2023-2025)": 995517
+  },
+  "epa_regions": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10"
+  ],
+  "contaminants": 30,
+  "collection_date_range": [
+    "2023-01-03 00:00:00",
+    "2025-12-17 00:00:00"
+  ]
+}
