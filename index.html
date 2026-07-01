@@ -338,6 +338,58 @@
 
     .text-card p:last-child { margin-bottom: 0; }
 
+    details.full-text {
+      background: var(--surface);
+      padding: 1.35rem 1.5rem;
+    }
+
+    details.full-text summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    details.full-text summary::-webkit-details-marker { display: none; }
+
+    details.full-text summary::after {
+      content: 'Read more';
+      flex-shrink: 0;
+      color: var(--orange);
+      border: 1px solid var(--orange-dim);
+      background: var(--orange-lo);
+      border-radius: 3px;
+      padding: 0.26rem 0.55rem;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    details.full-text[open] summary {
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.85rem;
+    }
+
+    details.full-text[open] summary::after { content: 'Show less'; }
+
+    details.full-text p {
+      color: var(--text-2);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 0.75rem;
+    }
+
+    details.full-text p:last-child { margin-bottom: 0; }
+
     .text-card a,
     .source-desc a {
       color: #a9c1ff;
@@ -1146,16 +1198,14 @@
         <h3>Research Question</h3>
         <p>Who bears the burden of PFAS contamination in America, and who decided they would?</p>
       </article>
-      <article class="text-card">
-        <h3>Project Framing</h3>
-        <p><strong class="term" tabindex="0" data-def="Per- and polyfluoroalkyl substances: synthetic chemicals that persist in the environment and can build up over time.">Per- and polyfluoroalkyl substances (PFAS)</strong>, better known as <strong class="term" tabindex="0" data-def="A plain-language name for PFAS because they break down very slowly in people, water, and soil.">"forever chemicals,"</strong> are an extensive family of synthetic fluorocarbons linked to immunity deficiency, cancer, birth defects, and hepatic and kidney disease. These chemicals accumulate in the environment, making exposure a long-term risk.</p>
-        <p>Using an <strong class="term" tabindex="0" data-def="A framework for asking whether environmental harms and protections are distributed fairly across communities.">environmental justice</strong> framework, this project investigates PFAS exposure in drinking water and asks whether that exposure is linked to race, class, age structure, and rurality. The goal is to determine not only who is burdened by PFAS contamination, but also which systems of power allowed that burden to fall where it did.</p>
-      </article>
-      <article class="text-card">
-        <h3>Environmental Justice Framework</h3>
-        <p>The project draws on <strong class="term" tabindex="0" data-def="An academic framework for examining how race and racism are embedded in laws, institutions, and social systems.">critical race theory</strong> and <strong class="term" tabindex="0" data-def="A framework for understanding how overlapping identities shape experiences of power, oppression, and discrimination.">intersectional feminism</strong> to examine how environmental harms are distributed and hidden along racial and socioeconomic lines. Robert Bullard's environmental justice framework centers the right of all people to live, work, play, go to school, and worship in a clean and healthy environment.</p>
-        <p>This approach also asks how databases and visualizations carry the interests, goals, and biases of the institutions that produce them. In that sense, the map is not only a technical object; it is a way to make structural inequality visible.</p>
-      </article>
+      <details class="full-text" open>
+        <summary>Introduction</summary>
+        <p><strong class="term" tabindex="0" data-def="Per- and polyfluoroalkyl substances: synthetic chemicals that persist in the environment and can build up over time.">Per- and polyfluoroalkyl substances (PFAS)</strong>, better known as <strong class="term" tabindex="0" data-def="A plain-language name for PFAS because they break down very slowly in people, water, and soil.">"forever chemicals,"</strong> are an extensive family of synthetic fluorocarbons that have been linked to immunity deficiency, cancer, birth defects, and hepatic and kidney disease (Williams). These chemicals accumulate in the environment, making exposure a long term risk. Owing to their ubiquity, our project investigates exposure to PFAS in drinking water and whether this exposure is linked to socioeconomic factors such as race, class, age structure, and rurality. While the EPA and several state governments have enacted regulations of PFAS, the question remains about the effectiveness of such policies and whether such protections reach communities equitably. Using an <strong class="term" tabindex="0" data-def="A framework for asking whether environmental harms and protections are distributed fairly across communities.">environmental justice</strong> framework that focuses on whether environmental harms follow existing lines of racial and economic inequality, we aim to uncover this relationship by examining potential intersections among the EPA's live contamination database, Census Bureau demographic data, and CDC Social Vulnerability Indices. Our goal is to determine not only the individuals burdened by PFAS contamination, but also those in positions of power who allowed it to happen.</p>
+      </details>
+      <details class="full-text">
+        <summary>Environmental Justice Framework</summary>
+        <p>In our project, we will analyze the database through an environmental justice framework that draws on <strong class="term" tabindex="0" data-def="An academic framework for examining how race and racism are embedded in laws, institutions, and social systems.">critical race theory</strong> and <strong class="term" tabindex="0" data-def="A framework for understanding how overlapping identities shape experiences of power, oppression, and discrimination.">intersectional feminism</strong> to examine how environmental harms are distributed and hidden along racial and socioeconomic lines. According to the UNDP, applying an environmental justice framework entails attention to "increasing accountability and protection of 'environmental rights'", and promoting "the environmental rule of law" (UNDP). Robert Bullard, a sociologist known as the "father of environmental justice", posits that environmental justice operates "under the assumption that all Americans have a basic right to live, work, play, go to school, and worship in a clean and healthy environment" (Bullard xiii). This establishes that environmental justice can illuminate underlying socioeconomic and racial factors that could explain correlations between inequality and environmental harm, and repositions environmental data as a lens for understanding human inequality. In practice, it also encompasses the need to address "rhetorical [...] bias-laden visual artifacts" inherent in most databases as described in a critical race theory framework (Hepworth &amp; Church par. 47), and asking "with whose interests and goals" in mind as described in feminist theory (Rezai par. 11). Thus, analyzing PFAS contamination through an environmental justice lens can not only make it easier for us to explore the multifaceted, intersectional issues that explain the patterns behind such contamination, but also humanize the narrative behind those affected by and those responsible for the distribution of PFAS contamination.</p>
+      </details>
     </div>
 
     <div class="map-help" aria-label="Map interaction help">
@@ -1248,21 +1298,18 @@
     </div>
 
     <div class="text-stack">
-      <article class="text-card">
-        <h3>Methods</h3>
-        <p>The pipeline retrieves PFAS measurements from the EPA's PFAS Analytic Tools, which surface UCMR-5 drinking water testing data for public water systems. It filters to readings at or above each analyte's Minimum Reporting Level, the threshold below which laboratories cannot reliably confirm the concentration detected.</p>
-        <p>Because UCMR reports ZIP codes served by water systems while ACS demographic data is published for ZIP Code Tabulation Areas, the project applies a ZIP-to-ZCTA crosswalk. Each contamination record is joined to ZCTA geography and ACS 5-year estimates, then aggregated to a mean PFAS concentration per ZCTA and reporting period.</p>
-      </article>
-      <article class="text-card">
-        <h3>Data Limitations</h3>
-        <p>Differences across ZCTAs reflect not only contamination, but also where testing happened. UCMR monitoring thresholds favor large public water systems and often exclude private wells. Coverage is uneven, so under-monitored areas, often rural and lower-income, can appear artificially clean.</p>
-        <p>Because this missingness may correlate with the demographics being studied, the project treats "not tested" as a distinct category rather than a low or absent value. The ZIP-served field is also an approximation, because a system may serve only part of a listed ZIP code.</p>
-      </article>
-      <article class="text-card">
-        <h3>Ethical Considerations</h3>
-        <p>Data visualization compresses people and stories into aggregates, sometimes obscuring the human context behind the numbers. The story highlights are included to surface some of what aggregation can hide, while recognizing that many affected communities still remain outside the project's narrative frame.</p>
-        <p>The team also recognizes its positionality as outsiders working with public datasets and institutional methodologies. The project does not control the underlying data collection, only the visualizations and analysis built on top of it.</p>
-      </article>
+      <details class="full-text" open>
+        <summary>Methods</summary>
+        <p>Our pipeline retrieves PFAS measurements directly from the EPA's PFAS Analytic Tools, which surface the Unregulated Contaminants in Drinking Water Monitoring Rule (UCMR)-5 drinking water testing data for public water systems, and filters to readings at or above each analyte's Minimum Reporting Level (MRL), which is the threshold below which the laboratory cannot reliably confirm the concentration detected. Because UCMR reports the ZIP codes a water system serves while the American Community Survey (ACS) census data are published for ZIP Code Tabulation Areas (ZCTAs), we apply a ZIP-to-ZCTA crosswalk to join each contamination record to its ZCTA geography and ACS 5-year estimates, and aggregate to a mean PFAS concentration per ZCTA, per reporting period. The resulting dataset is keyed on ZCTA and each row captures the sample date/reporting period, the ZCTA identifier, its geo-polygon boundary data, a set of demographic and socioeconomic variables (race/ethnicity concentration, median household income, etc.) and the mean concentration. This builds The Map, where each geo-polygon is shaded by the selected demographic variable and a 3D bar encodes mean contamination in its height and color, and The Record, where this processed dataset is used to drive further analysis and insights on the timeline and extent of PFAS contamination.</p>
+      </details>
+      <details class="full-text">
+        <summary>Data Limitations</summary>
+        <p>Several limitations follow from this design and inform how The Map and The Record should be read. Most fundamentally, differences across ZCTAs reflect not just contamination but where testing happened. Specifically, UCMR's monitoring thresholds favor large public water systems and often exclude private wells entirely. Furthermore, coverage is uneven, so under-monitored areas which often skew rural and lower-income, can appear artificially clean. Because this missingness correlates with the very demographics we study, we treat "not tested" as a distinct category rather than just a low (or an absence of a) value. Finally, the ZIP-served field is not a precise service area because a system may occasionally serve only part of a listed ZIP, so the ZCTA join is an approximation and not a measure of individual exposure.</p>
+      </details>
+      <details class="full-text">
+        <summary>Ethical Considerations</summary>
+        <p>Beyond technical limitations and practices for our project, there are also ethical considerations we need to account for. Data visualization compresses individuals and their different stories into an aggregate that sometimes obscures human context behind the numbers. That is part of the reason why we have added a story highlight section to our narrative analysis. Our hope is that by highlighting these stories that cover a wide range of contexts within the scope of PFAS contamination and environmental justice, we can surface some of the context that aggregating numbers tend to neglect. Still, there are stories and communities who are impacted in the same way that we fail to highlight and account for. In terms of data feminism, our choices of dataset, visualizations, and even the stories we highlighted ultimately influence how our audience views PFAS contamination in this given context (Rezai par. 11). We have made every effort to present multiple narratives and handle situations where we have limited data. Although there exists a gap between our project and the underlying story for these communities, by addressing that this gap exists we hope to give the audience a general understanding of some of the frameworks relevant to digital humanities and the potential extensions to our project. Our positionality also contributes to that gap: we are essentially outsiders looking in on these stories and working with public datasets built on data and methodologies predetermined by institutions. We did not make decisions on the underlying data itself, only the visualizations and analysis built on top of it. These are the ethical considerations we hope the reader carries with them as they engage with our project.</p>
+      </details>
     </div>
 
     <div class="viz-row">
@@ -1403,11 +1450,13 @@
     </div>
 
     <div class="text-stack">
-      <article class="text-card">
-        <h3>Narrative Analysis</h3>
-        <p>A 2023 Harvard study by Jahred Liddie and collaborators found that predominantly Black and Latino communities saw higher PFAS concentrations in drinking water. The study connected this pattern to nearby industrial buildings, military plants, and airports clustered near communities with less political and economic power to challenge those decisions.</p>
-        <p>The following case studies trace patterns that may not be fully captured through data analysis. Together with the map and record, they foreground the decisions, institutions, and power dynamics behind contamination.</p>
-      </article>
+      <details class="full-text" open>
+        <summary>Narrative Analysis</summary>
+        <p>A 2023 Harvard study published one of the first national studies on PFAS in drinking water. Testing from eight thousand community water systems across the US, researcher Jahred Liddie and his team found that communities that were predominantly Black and Latino saw higher levels of PFAS concentration (Liddie et al.). The cause of this phenomenon was shown to be a result of industrial buildings, military plants, and airports near the communities' water systems. The research suggests that these facilities were disproportionately clustered near communities of color, targeting communities with the least amount of power to act against these decisions in society. Furthermore, the states that were included in the study were ones who had sufficient monitoring data to reach these conclusions. There are many similar situations across the country where marginalized communities, lacking political and economic power to challenge these decisions, are targeted. The full extent of PFAS likely exceeds what current studies document, and that gap is one of the main motivations behind this project.</p>
+        <p>Thus, the following case studies intend to trace patterns of PFAS contamination that may not be fully captured through data analysis. From accounts of contamination in low-income and non-white communities to corporate concealment and institutional negligence, these stories-along with our data visualizations-illuminate the human decisions and power dynamics behind the environmental crisis of PFAS contamination.</p>
+        <p>Liddie, Jahred M, et al. "Sociodemographic Factors Are Associated with the Abundance of PFAS Sources and Detection in U.S. Community Water Systems." ACS Publications, vol. 57, no. 21, 30 May 2023, pp. 7902-7912, https://doi.org/10.1021/acs.est.2c07255. Accessed 29 June 2026.</p>
+        <p>Staff Writer. "Communities of Color Disproportionately Exposed to PFAS Pollution in Drinking Water." Harvard T.H. Chan School of Public Health, 15 May 2023, https://hsph.harvard.edu/news/communities-of-color-disproportionately-exposed-to-pfas-pollution-in-drinking-water/. Accessed 29 June 2026.</p>
+      </details>
     </div>
 
     <div class="story-grid">
