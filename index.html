@@ -463,11 +463,21 @@
     /* ── MAP ── */
     .map-layout {
       display: grid;
-      grid-template-columns: 1fr 230px;
+      grid-template-columns: 1fr;
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
     }
+    .map-fs-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 6; cursor: pointer;
+      font: 600 0.72rem/1 'DM Sans', system-ui, sans-serif; color: var(--text);
+      background: rgba(19,21,26,0.85); border: 1px solid var(--border-2);
+      border-radius: 5px; padding: 0.45rem 0.7rem;
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    }
+    .map-fs-btn:hover { background: rgba(30,33,42,0.95); }
+    .map-placeholder:fullscreen { height: 100vh; }
+    .map-placeholder:-webkit-full-screen { height: 100vh; }
 
     .map-help {
       display: flex;
@@ -1218,51 +1228,16 @@
     </div>
 
     <div class="map-layout">
-      <div class="map-placeholder" role="img" aria-label="Interactive PFAS contamination map at the ZCTA level">
+      <div class="map-placeholder loading" id="map-shell" role="img" aria-label="Interactive PFAS contamination map at the ZCTA level">
         <div class="map-loader" id="map-loader" aria-live="polite" aria-hidden="true">
           <span class="spinner" aria-hidden="true"></span>
-          <span>Loading layer</span>
+          <span>Loading map</span>
         </div>
-        <iframe id="map-frame" title="PFAS contamination map"
-                src="maps/map_all-time_pct_nonwhite_both.html"
+        <button type="button" class="map-fs-btn" id="map-fs-btn" aria-label="Toggle fullscreen">&#10530; Fullscreen</button>
+        <iframe id="map-frame" title="Interactive PFAS and Environmental Justice map"
+                src="web/map.html"
                 style="width:100%;height:100%;border:0;display:block;"
-                loading="lazy" allow="fullscreen"></iframe>
-      </div>
-
-      <div class="map-sidebar" aria-label="Map layer controls">
-        <div class="sidebar-label">Layer Controls</div>
-        <div>
-          <div class="control-group-label" id="ctrl-choropleth">Choropleth Variable</div>
-          <div class="radio-list" id="var-list" role="group" aria-labelledby="ctrl-choropleth">
-            <button class="radio-opt sel" aria-pressed="true"  data-var="pct_nonwhite">Race / Ethnicity Concentration</button>
-            <button class="radio-opt" aria-pressed="false" data-var="median_hh_income">Median Household Income</button>
-            <button class="radio-opt" aria-pressed="false" data-var="pct_below_poverty">% Below Poverty</button>
-            <button class="radio-opt" aria-pressed="false" data-var="pct_hispanic">% Hispanic</button>
-            <button class="radio-opt" aria-pressed="false" data-var="pct_black_nh">% Black, non-Hispanic</button>
-            <button class="radio-opt" aria-pressed="false" data-var="pct_asian_nh">% Asian, non-Hispanic</button>
-            <button class="radio-opt" aria-pressed="false" data-var="total_pop">Total Population</button>
-          </div>
-        </div>
-        <div>
-          <div class="control-group-label" id="ctrl-mode">Map Layers</div>
-          <div class="radio-list" id="mode-list" role="group" aria-labelledby="ctrl-mode">
-            <button class="radio-opt sel" aria-pressed="true"  data-mode="both">Choropleth + bars</button>
-            <button class="radio-opt" aria-pressed="false" data-mode="choropleth">Choropleth only</button>
-            <button class="radio-opt" aria-pressed="false" data-mode="bars">Bars only</button>
-          </div>
-        </div>
-        <div>
-          <div class="control-group-label">Color Scale</div>
-          <div class="legend-bar" role="img" aria-label="Gradient from blue (lower burden) to orange (higher burden)"></div>
-          <div class="legend-labels" aria-hidden="true"><span>Lower burden</span><span>Higher burden</span></div>
-        </div>
-        <div>
-          <div class="control-group-label">Bar Height &amp; Markers</div>
-          <div class="legend-labels" style="display:block;color:var(--text-sub);font-size:0.72rem;line-height:1.55;">
-            Bars: mean PFAS concentration per ZCTA. Red rings mark ZCTAs with the highest
-            demographic and PFAS overlap. Missing or untested areas should not be read as clean.
-          </div>
-        </div>
+                allow="fullscreen"></iframe>
       </div>
     </div>
 
@@ -1679,44 +1654,29 @@
     });
   });
 
-  function updateMap() {
-    const frame = document.getElementById('map-frame');
-    if (!frame) return;
-    const mapShell = frame.closest('.map-placeholder');
-    const varBtn  = document.querySelector('#var-list .radio-opt.sel');
-    const modeBtn = document.querySelector('#mode-list .radio-opt.sel');
-    const v = varBtn  ? varBtn.dataset.var   : 'pct_nonwhite';
-    const m = modeBtn ? modeBtn.dataset.mode : 'both';
-    // bars-only is identical across variables -> one shared file
-    const src = (m === 'bars')
-      ? 'maps/map_all-time_total_pop_bars.html'
-      : 'maps/map_all-time_' + v + '_' + m + '.html';
-    if (frame.getAttribute('src') !== src) {
-      mapShell?.classList.add('loading');
-      frame.setAttribute('src', src);
-    }
-  }
-
+  // The map is a self-contained page (web/map.html) with its own controls.
+  // Manage only the initial loader and the fullscreen toggle here.
   const mapFrame = document.getElementById('map-frame');
   if (mapFrame) {
     const mapShell = mapFrame.closest('.map-placeholder');
     mapFrame.addEventListener('load', () => {
-      window.setTimeout(() => mapShell?.classList.remove('loading'), 140);
+      window.setTimeout(() => mapShell && mapShell.classList.remove('loading'), 140);
+    });
+  }
+  const mapFsBtn = document.getElementById('map-fs-btn');
+  if (mapFsBtn) {
+    mapFsBtn.addEventListener('click', () => {
+      const el = document.getElementById('map-shell');
+      if (!el) return;
+      if (!document.fullscreenElement) {
+        (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+      } else {
+        document.exitFullscreen();
+      }
     });
   }
 
-  document.querySelectorAll('.radio-list').forEach(list => {
-    list.querySelectorAll('.radio-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        list.querySelectorAll('.radio-opt').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
-        btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
-        updateMap();
-      });
-    });
-  });
-  updateMap();
-
-  // ── US MAP via D3 + real TopoJSON ──────────────────────────────
+    // ── US MAP via D3 + real TopoJSON ──────────────────────────────
   // Fetches the actual US state boundaries from us-atlas and renders
   // them with an Albers USA projection — the standard for US thematic maps.
   (async function renderUSMap() {
