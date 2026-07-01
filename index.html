@@ -767,6 +767,55 @@
     .story-body p { font-size: 0.78rem; color: var(--text-2); line-height: 1.65; font-weight: 300; }
     .story-source { margin-top: 0.7rem; font-size: 0.68rem; color: var(--text-sub); line-height: 1.5; }
 
+    .story-expanded {
+      display: none;
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .story-card.expanded .story-expanded { display: block; }
+
+    .story-expanded p {
+      font-size: 0.8rem;
+      line-height: 1.72;
+      margin-bottom: 0.75rem;
+    }
+
+    .story-expanded p:last-child { margin-bottom: 0; }
+
+    .read-more-btn {
+      all: unset;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-top: 0.9rem;
+      padding: 0.48rem 0.72rem;
+      background: var(--orange-lo);
+      border: 1px solid var(--orange-dim);
+      color: var(--orange);
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .read-more-btn:hover {
+      background: rgba(224,114,74,0.16);
+      color: #f0a078;
+    }
+
+    .read-more-btn::after {
+      content: '+';
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .story-card.expanded .read-more-btn::after { content: '-'; }
+
     /* ── TEAM ── */
     .team-grid {
       display: grid;
@@ -1374,8 +1423,13 @@
           <p class="story-tag">Visualizing Burden</p>
           <h3>Newburgh, New York</h3>
           <p>In 2016, New York discovered PFOS contamination in Washington Lake near Newburgh and traced the source to Stewart Air National Guard Base. Residents near the area reported PFOS blood concentrations five times the average after likely consuming contaminated water for decades.</p>
-          <p>Newburgh is a majority Latino and Black city facing economic marginalization, making it a clear example of how exposure can follow existing lines of racial and economic inequality.</p>
-          <p class="story-source">Source: Shantal Riley, VICE, 2020.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-burden">Read more</button>
+          <div class="story-expanded" id="story-burden">
+            <p>Newburgh is a majority Latino and Black city facing economic marginalization. Similar to the Harvard study discussed above, this case shows how PFAS exposure can follow existing lines of racial and economic inequality.</p>
+            <p>The pattern identified by Liddie and collaborators appears to repeat nationally: marginalized communities are impacted by decisions made around them and for them, often before they are given the information or resources needed to protect themselves.</p>
+            <p>This connects to the project's environmental justice framework because Newburgh residents lacked a meaningful opportunity to prevent PFAS exposure before the damage was done. The case helps turn the map's aggregate patterns into a human story about uneven power, delayed disclosure, and unequal protection.</p>
+            <p class="story-source">Source: Shantal Riley, "The New York Water Crisis That Nobody's Talking About," VICE, 21 Jan. 2020.</p>
+          </div>
         </div>
       </article>
       <article class="story-card">
@@ -1384,8 +1438,13 @@
           <p class="story-tag">Visualizing Cost</p>
           <h3>3M, DuPont, and Withheld Knowledge</h3>
           <p>In 1997, Kris Hansen was hired by 3M to investigate PFOS. Her tests on blood bank samples showed that PFOS was already widespread, while internal records revealed that 3M had known about harmful consequences and had hidden reports and studies.</p>
-          <p>A 2023 analysis of DuPont and 3M documents found that both companies' labs identified PFAS toxicity decades before public disclosure. This shows how industry-controlled data can protect corporate interests instead of public health.</p>
-          <p class="story-source">Sources: Nadia Gaber et al., 2023; Sharon Lerner, ProPublica, 2024.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-cost">Read more</button>
+          <div class="story-expanded" id="story-cost">
+            <p>This story reveals the intention and causation behind the PFAS crisis. Contamination from PFAS was not simply accidental; it was shaped by companies and organizations prioritizing efficiency, liability management, and cost over public health.</p>
+            <p>Those with power, including those with early knowledge of contamination, were able to externalize risk onto communities with far less ability to fight back. In the context of this project, the question of who decides these consequences points to a structure that allows harm to continue at the expense of people with less institutional power.</p>
+            <p>The pattern extends beyond 3M. A 2023 study of documents from DuPont and 3M found that both companies' laboratories identified PFAS toxicity decades before that information was publicly declared. Through a data feminism lens, this is a clear example of how data can carry the interests and goals of its creators. Company research was produced, withheld, and structured in ways that protected the companies rather than the public.</p>
+            <p class="story-source">Sources: Nadia Gaber et al., "The Devil They Knew," Annals of Global Health, 2023; Sharon Lerner, ProPublica, 2024.</p>
+          </div>
         </div>
       </article>
       <article class="story-card">
@@ -1394,8 +1453,13 @@
           <p class="story-tag">Visualizing Negligence</p>
           <h3>Marinette, Wisconsin</h3>
           <p>Residents near a fire training facility in Marinette were exposed to PFAS contamination for years before being notified by Arcadis, a consulting firm hired to investigate water sources. When residents sought answers, authorities advised against blood tests, citing the lack of effective treatments.</p>
-          <p>The harm here is physical and institutional: a gap between institutional knowledge and public disclosure left residents with illness, uncertainty, and little recourse.</p>
-          <p class="story-source">Source: Thomas W. Pearson, SAPIENS, 2020.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-negligence">Read more</button>
+          <div class="story-expanded" id="story-negligence">
+            <p>Residents were left with the results of years of contamination, unexplained illnesses, and a system that knew there were problems but did not solve them. This reveals another layer of PFAS harm: the damage is not only physical, but institutional.</p>
+            <p>Stories like Marinette, where a gap exists between institutional knowledge and public disclosure, are exactly what this project aims to make visible. Under an intersectional feminist framework focused on environmental justice, data visualizations need to be paired with narratives about institutional neglect.</p>
+            <p>That pairing helps the audience see how people with power and resources can remain indifferent to hidden struggles in affected communities.</p>
+            <p class="story-source">Source: Thomas W. Pearson, "Communities Grapple With Exposure to 'Forever Chemicals,'" SAPIENS, 31 July 2020.</p>
+          </div>
         </div>
       </article>
       <article class="story-card">
@@ -1404,8 +1468,13 @@
           <p class="story-tag">Visualizing Accountability</p>
           <h3>Hoosick Falls, New York</h3>
           <p>After his father died of kidney cancer, Michael Hickey noticed illness patterns in Hoosick Falls and tested the water himself after local authorities declined to do so. The testing revealed PFAS contamination tied to a local manufacturing plant.</p>
-          <p>The story shows how accountability failures can force residents to perform the labor that institutions should have carried out, making community members responsible for exposing risks they did not create.</p>
-          <p class="story-source">Source: William Brangham, PBS NewsHour, 2025.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-accountability">Read more</button>
+          <div class="story-expanded" id="story-accountability">
+            <p>Settlements were eventually issued to residents, but the lives lost were permanent consequences of neglect. The fact that a resident could test the water himself shows that one of the central problems around PFAS contamination is accountability.</p>
+            <p>Institutions had the responsibility and capacity to act, yet community members were forced to fill the gap. This is just one example of how an unaccountable system, which decides residents' fate for them, can leave lasting impacts on the communities it is meant to serve.</p>
+            <p>From a data feminism perspective, Hickey's work also illuminates the labor behind exposing the PFAS crisis. The responsibility to collect, test, and present data ethically fell to the community that public institutions were supposed to protect. This case asks who has to do the work of making harm visible when official systems fail.</p>
+            <p class="story-source">Source: William Brangham, "How a Small Community Fought for Justice After Finding Forever Chemicals in Drinking Water," PBS NewsHour, 13 Nov. 2025.</p>
+          </div>
         </div>
       </article>
     </div>
@@ -1544,6 +1613,15 @@
     if (idx === -1) return;
     if (e.key === 'ArrowRight') { tabs[(idx + 1) % tabs.length].focus(); e.preventDefault(); }
     if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); e.preventDefault(); }
+  });
+
+  document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.story-card');
+      const expanded = card.classList.toggle('expanded');
+      btn.setAttribute('aria-expanded', String(expanded));
+      btn.firstChild.textContent = expanded ? 'Show less' : 'Read more';
+    });
   });
 
   function updateMap() {
