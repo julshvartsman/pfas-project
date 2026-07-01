@@ -307,24 +307,256 @@
       font-weight: 300;
     }
 
+    .text-stack {
+      display: grid;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .text-card {
+      background: var(--surface);
+      padding: 1.35rem 1.5rem;
+    }
+
+    .text-card h3 {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.65rem;
+      line-height: 1.35;
+    }
+
+    .text-card p {
+      color: var(--text-2);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 0.75rem;
+    }
+
+    .text-card p:last-child { margin-bottom: 0; }
+
+    details.full-text {
+      background: var(--surface);
+      padding: 1.35rem 1.5rem;
+    }
+
+    details.full-text summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    details.full-text summary::-webkit-details-marker { display: none; }
+
+    details.full-text summary::after {
+      content: 'Read more';
+      flex-shrink: 0;
+      color: var(--orange);
+      border: 1px solid var(--orange-dim);
+      background: var(--orange-lo);
+      border-radius: 3px;
+      padding: 0.26rem 0.55rem;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    details.full-text[open] summary {
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.85rem;
+    }
+
+    details.full-text[open] summary::after { content: 'Show less'; }
+
+    details.full-text p {
+      color: var(--text-2);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 0.75rem;
+    }
+
+    details.full-text p:last-child { margin-bottom: 0; }
+
+    .text-card a,
+    .source-desc a {
+      color: #a9c1ff;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(169,193,255,0.35);
+    }
+
+    .text-card a:hover,
+    .source-desc a:hover { color: var(--text); border-bottom-color: var(--text); }
+
+    .term {
+      position: relative;
+      color: var(--text);
+      font-weight: 600;
+      border-bottom: 1px dotted rgba(169,193,255,0.55);
+      cursor: help;
+    }
+
+    .term::after {
+      content: attr(data-def);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%) translateY(4px);
+      width: min(260px, 78vw);
+      padding: 0.7rem 0.8rem;
+      background: #080c16;
+      border: 1px solid var(--border-2);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.38);
+      color: var(--text-2);
+      font-size: 0.74rem;
+      line-height: 1.45;
+      font-weight: 300;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      transition: opacity 0.14s ease, transform 0.14s ease;
+    }
+
+    .term::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--border-2);
+      opacity: 0;
+      z-index: 31;
+      transition: opacity 0.14s ease;
+    }
+
+    .term:hover::after,
+    .term:focus-visible::after,
+    .term:hover::before,
+    .term:focus-visible::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
     /* ── MAP ── */
     .map-layout {
       display: grid;
-      grid-template-columns: 1fr 210px;
+      grid-template-columns: 1fr;
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
     }
+    .map-fs-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 6; cursor: pointer;
+      font: 600 0.72rem/1 'DM Sans', system-ui, sans-serif; color: var(--text);
+      background: rgba(19,21,26,0.85); border: 1px solid var(--border-2);
+      border-radius: 5px; padding: 0.45rem 0.7rem;
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    }
+    .map-fs-btn:hover { background: rgba(30,33,42,0.95); }
+    .map-placeholder:fullscreen { height: 100vh; }
+    .map-placeholder:-webkit-full-screen { height: 100vh; }
+
+    .map-help {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      padding: 0.85rem 1rem;
+      color: var(--text-2);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .map-help strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .map-disclaimer {
+      background: rgba(224,114,74,0.08);
+      border: 1px solid var(--orange-dim);
+      border-bottom: none;
+      padding: 0.9rem 1rem;
+      color: var(--text-2);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .map-disclaimer strong {
+      color: var(--orange);
+      font-weight: 600;
+    }
 
     .map-placeholder {
       background: #080c16;
-      height: 500px;
+      height: 640px;
       position: relative;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
+    .map-placeholder iframe { transition: opacity 0.16s ease; }
+    .map-placeholder.loading iframe { opacity: 0.22; }
+
+    .map-loader {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      background: rgba(8,12,22,0.5);
+      color: var(--text-2);
+      font-size: 0.78rem;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.16s ease;
+    }
+
+    .map-placeholder.loading .map-loader { opacity: 1; }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(169,193,255,0.25);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .map-center-content {
       position: relative;
@@ -567,34 +799,78 @@
 
     .story-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
     }
 
     article.story-card { background: var(--surface); overflow: hidden; }
-
-    .story-img {
-      height: 120px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-end;
-      padding: 0.75rem;
+    article.story-card {
       position: relative;
-      overflow: hidden;
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     }
 
-    .story-img-label { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 0.06em; text-transform: uppercase; position: relative; z-index: 1; }
-
-    .img-a { background: linear-gradient(135deg, #080e20 0%, #0f1e40 100%); }
-    .img-b { background: linear-gradient(135deg, #140806 0%, #2a1208 100%); }
-    .img-c { background: linear-gradient(135deg, #080b18 0%, #121830 100%); }
+    article.story-card.story-active {
+      background: var(--surface-2);
+      box-shadow: inset 0 0 0 1px rgba(224,114,74,0.45), 0 0 28px rgba(224,114,74,0.12);
+      transform: translateY(-2px);
+    }
 
     .story-body { padding: 1rem; }
     .story-tag { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.4rem; }
     .story-body h3 { font-size: 0.88rem; font-weight: 500; color: var(--text); margin-bottom: 0.35rem; line-height: 1.35; }
     .story-body p { font-size: 0.78rem; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+    .story-source { margin-top: 0.7rem; font-size: 0.68rem; color: var(--text-sub); line-height: 1.5; }
+
+    .story-expanded {
+      display: none;
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .story-card.expanded .story-expanded { display: block; }
+
+    .story-expanded p {
+      font-size: 0.8rem;
+      line-height: 1.72;
+      margin-bottom: 0.75rem;
+    }
+
+    .story-expanded p:last-child { margin-bottom: 0; }
+
+    .read-more-btn {
+      all: unset;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-top: 0.9rem;
+      padding: 0.48rem 0.72rem;
+      background: var(--orange-lo);
+      border: 1px solid var(--orange-dim);
+      color: var(--orange);
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .read-more-btn:hover {
+      background: rgba(224,114,74,0.16);
+      color: #f0a078;
+    }
+
+    .read-more-btn::after {
+      content: '+';
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .story-card.expanded .read-more-btn::after { content: '-'; }
 
     /* ── TEAM ── */
     .team-grid {
@@ -625,7 +901,7 @@
     .avatar-initial.orange { background: var(--orange-lo); border-color: var(--orange-dim); color: var(--orange); }
 
     .team-name { font-size: 0.86rem; font-weight: 500; color: var(--text); margin-bottom: 0.15rem; }
-    .team-role { font-size: 0.74rem; color: var(--text-2); margin-bottom: 0.4rem; }
+    .team-role { font-size: 0.74rem; color: var(--text-2); margin-bottom: 0.4rem; line-height: 1.5; }
 
     .comp-tag {
       font-size: 0.65rem; font-weight: 600; letter-spacing: 0.07em;
@@ -688,6 +964,63 @@
 
     .rq-text em { color: var(--text); font-style: normal; }
 
+    .bibliography {
+      display: grid;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    .bib-entry {
+      background: var(--surface);
+      padding: 1rem 1.25rem;
+    }
+
+    .bib-entry strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.45;
+      margin-bottom: 0.35rem;
+    }
+
+    .bib-entry p {
+      color: var(--text-2);
+      font-size: 0.76rem;
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    .glossary-term {
+      background: var(--surface);
+      padding: 0.9rem 1rem;
+    }
+
+    .glossary-term dt {
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .glossary-term dd {
+      color: var(--text-2);
+      font-size: 0.74rem;
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
@@ -704,11 +1037,15 @@
     @media (max-width: 720px) {
       .section-header { grid-template-columns: 1fr; }
       .map-layout     { grid-template-columns: 1fr; }
+      .map-help       { align-items: flex-start; flex-direction: column; }
+      .map-placeholder { height: 520px; }
       .viz-row        { grid-template-columns: 1fr; }
       .story-grid     { grid-template-columns: 1fr; }
       .team-grid      { grid-template-columns: 1fr 1fr; }
       .sources-row    { grid-template-columns: 1fr; }
       .info-row       { grid-template-columns: 1fr; }
+      .note-grid      { grid-template-columns: 1fr; }
+      .glossary-grid  { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -727,22 +1064,22 @@
     <p class="kicker">Digital Humanities &nbsp;·&nbsp; Environmental Justice &nbsp;·&nbsp; 2026</p>
     <h1>Who Bears the Burden of<br><span>PFAS Contamination</span><br>in America?</h1>
     <p class="header-desc">
-      An intersectional investigation of per- and polyfluoroalkyl substance exposure
-      across race, class, rurality, and geography in US drinking water.
-      Three datasets. Three lenses. One structural question.
+      An environmental justice investigation of PFAS exposure in US drinking water,
+      connecting EPA contamination data with Census demographics and CDC social
+      vulnerability measures to ask who is burdened, and who decided they would be.
     </p>
     <div class="stat-strip">
       <div class="stat">
-        <div class="stat-val">12,000+</div>
-        <div class="stat-label">Water systems tested</div>
+        <div class="stat-val">UCMR-5</div>
+        <div class="stat-label">Drinking water testing data</div>
       </div>
       <div class="stat">
-        <div class="stat-val">~45%</div>
-        <div class="stat-label">US tap water affected</div>
+        <div class="stat-val">ZCTA</div>
+        <div class="stat-label">Joined geography</div>
       </div>
       <div class="stat">
-        <div class="stat-val">80 yrs</div>
-        <div class="stat-label">Before federal MCL</div>
+        <div class="stat-val">EJ</div>
+        <div class="stat-label">Research framework</div>
       </div>
     </div>
   </div>
@@ -859,94 +1196,63 @@
         <div class="section-name">The Map</div>
       </div>
       <div class="section-right">
-        <h2>Interactive 3D Explorer</h2>
-        <p>A choropleth layer shades each geographic unit by demographic or vulnerability
-        profile on a blue → orange scale. 3D bars extrude from each boundary to encode
-        PFAS contamination — darker orange, taller bars signal communities carrying the
-        greatest burden with the fewest resources.</p>
+        <h2>Interactive ZCTA Explorer</h2>
+        <p>Each geo-polygon is shaded by a selected demographic or socioeconomic variable,
+        while 3D bars encode mean PFAS concentration. The map is designed to show both
+        contamination and the social conditions that shape who can respond to it.</p>
       </div>
     </div>
 
-    <div class="map-layout">
-      <div class="map-placeholder" role="img" aria-label="3D contamination map placeholder, in development">
-        <!-- Contamination spread rings -->
-        <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
-          <!-- Cluster 1 — midwest industrial -->
-          <circle cx="400" cy="220" r="8"   fill="#e0724a" fill-opacity="0.5"/>
-          <circle cx="400" cy="220" r="28"  fill="none" stroke="#e0724a" stroke-opacity="0.45" stroke-width="1.2"/>
-          <circle cx="400" cy="220" r="62"  fill="none" stroke="#e0724a" stroke-opacity="0.3"  stroke-width="0.9"/>
-          <circle cx="400" cy="220" r="108" fill="none" stroke="#c06030" stroke-opacity="0.2"  stroke-width="0.7"/>
-          <circle cx="400" cy="220" r="170" fill="none" stroke="#903020" stroke-opacity="0.12" stroke-width="0.5"/>
-          <!-- Cluster 2 — east coast -->
-          <circle cx="620" cy="175" r="6"   fill="#e0724a" fill-opacity="0.45"/>
-          <circle cx="620" cy="175" r="22"  fill="none" stroke="#e0724a" stroke-opacity="0.4"  stroke-width="1"/>
-          <circle cx="620" cy="175" r="52"  fill="none" stroke="#c06030" stroke-opacity="0.25" stroke-width="0.8"/>
-          <circle cx="620" cy="175" r="90"  fill="none" stroke="#903020" stroke-opacity="0.14" stroke-width="0.6"/>
-          <!-- Cluster 3 — west, blue (lower burden) -->
-          <circle cx="150" cy="240" r="5"   fill="#4a7de0" fill-opacity="0.4"/>
-          <circle cx="150" cy="240" r="18"  fill="none" stroke="#4a7de0" stroke-opacity="0.35" stroke-width="0.9"/>
-          <circle cx="150" cy="240" r="44"  fill="none" stroke="#3a60c0" stroke-opacity="0.2"  stroke-width="0.7"/>
-          <!-- Faint lat/lon grid -->
-          <line x1="0" y1="167" x2="800" y2="167" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
-          <line x1="0" y1="333" x2="800" y2="333" stroke="#4a7de0" stroke-opacity="0.06" stroke-width="0.5"/>
-          <line x1="267" y1="0" x2="267" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
-          <line x1="533" y1="0" x2="533" y2="500" stroke="#4a7de0" stroke-opacity="0.05" stroke-width="0.5"/>
-        </svg>
-        <div class="map-center-content">
-          <h3>3D Contamination Map</h3>
-          <p>deck.gl · choropleth + extruded 3D bars · census-tract level</p>
-          <div class="status-tag">In Development</div>
-        </div>
-      </div>
+    <div class="text-stack">
+      <article class="text-card">
+        <h3>Research Question</h3>
+        <p>Who bears the burden of PFAS contamination in America, and who decided they would?</p>
+      </article>
+      <details class="full-text" open>
+        <summary>Introduction</summary>
+        <p><strong class="term" tabindex="0" data-def="Per- and polyfluoroalkyl substances: synthetic chemicals that persist in the environment and can build up over time.">Per- and polyfluoroalkyl substances (PFAS)</strong>, better known as <strong class="term" tabindex="0" data-def="A plain-language name for PFAS because they break down very slowly in people, water, and soil.">"forever chemicals,"</strong> are an extensive family of synthetic fluorocarbons that have been linked to immunity deficiency, cancer, birth defects, and hepatic and kidney disease (Williams). These chemicals accumulate in the environment, making exposure a long term risk. Owing to their ubiquity, our project investigates exposure to PFAS in drinking water and whether this exposure is linked to socioeconomic factors such as race, class, age structure, and rurality. While the EPA and several state governments have enacted regulations of PFAS, the question remains about the effectiveness of such policies and whether such protections reach communities equitably. Using an <strong class="term" tabindex="0" data-def="A framework for asking whether environmental harms and protections are distributed fairly across communities.">environmental justice</strong> framework that focuses on whether environmental harms follow existing lines of racial and economic inequality, we aim to uncover this relationship by examining potential intersections among the EPA's live contamination database, Census Bureau demographic data, and CDC Social Vulnerability Indices. Our goal is to determine not only the individuals burdened by PFAS contamination, but also those in positions of power who allowed it to happen.</p>
+      </details>
+      <details class="full-text">
+        <summary>Environmental Justice Framework</summary>
+        <p>In our project, we will analyze the database through an environmental justice framework that draws on <strong class="term" tabindex="0" data-def="An academic framework for examining how race and racism are embedded in laws, institutions, and social systems.">critical race theory</strong> and <strong class="term" tabindex="0" data-def="A framework for understanding how overlapping identities shape experiences of power, oppression, and discrimination.">intersectional feminism</strong> to examine how environmental harms are distributed and hidden along racial and socioeconomic lines. According to the UNDP, applying an environmental justice framework entails attention to "increasing accountability and protection of 'environmental rights'", and promoting "the environmental rule of law" (UNDP). Robert Bullard, a sociologist known as the "father of environmental justice", posits that environmental justice operates "under the assumption that all Americans have a basic right to live, work, play, go to school, and worship in a clean and healthy environment" (Bullard xiii). This establishes that environmental justice can illuminate underlying socioeconomic and racial factors that could explain correlations between inequality and environmental harm, and repositions environmental data as a lens for understanding human inequality. In practice, it also encompasses the need to address "rhetorical [...] bias-laden visual artifacts" inherent in most databases as described in a critical race theory framework (Hepworth &amp; Church par. 47), and asking "with whose interests and goals" in mind as described in feminist theory (Rezai par. 11). Thus, analyzing PFAS contamination through an environmental justice lens can not only make it easier for us to explore the multifaceted, intersectional issues that explain the patterns behind such contamination, but also humanize the narrative behind those affected by and those responsible for the distribution of PFAS contamination.</p>
+      </details>
+    </div>
 
-      <div class="map-sidebar" aria-label="Map layer controls">
-        <div class="sidebar-label">Layer Controls</div>
-        <div>
-          <div class="control-group-label" id="ctrl-choropleth">Choropleth Variable</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-choropleth">
-            <button class="radio-opt sel" aria-pressed="true">% People of Color</button>
-            <button class="radio-opt" aria-pressed="false">Median Household Income</button>
-            <button class="radio-opt" aria-pressed="false">SVI Composite Score</button>
-            <button class="radio-opt" aria-pressed="false">% Below Poverty Line</button>
-            <button class="radio-opt" aria-pressed="false">% Rural Population</button>
-          </div>
+    <div class="map-help" aria-label="Map interaction help">
+      <span><strong>Map controls:</strong> scroll or pinch to zoom, drag to move around, and hold <strong>Ctrl</strong> while dragging to adjust the pitch or viewing angle.</span>
+      <span>Layer changes may take a moment to load.</span>
+    </div>
+
+    <div class="map-disclaimer" role="note" aria-label="Map data limitation">
+      <strong>Data visibility note:</strong> large blank areas do not necessarily mean PFAS-free water. To keep the map usable, it includes areas with detections at or above the <strong class="term" tabindex="0" data-def="The lowest concentration a laboratory can reliably measure and report.">Minimum Reporting Level</strong>; other places may be untested, missing from this layer, or below detectable concentration. This is a key <strong class="term" tabindex="0" data-def="A critique that asks what data is included, what is left out, and whose experience becomes visible or invisible as a result.">data feminism</strong> limitation: the map shows what the dataset can make visible, not the full geography of possible exposure.
+    </div>
+
+    <div class="map-layout">
+      <div class="map-placeholder loading" id="map-shell" role="img" aria-label="Interactive PFAS contamination map at the ZCTA level">
+        <div class="map-loader" id="map-loader" aria-live="polite" aria-hidden="true">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Loading map</span>
         </div>
-        <div>
-          <div class="control-group-label" id="ctrl-geo">Geographic Unit</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-geo">
-            <button class="radio-opt sel" aria-pressed="true">Census Tract</button>
-            <button class="radio-opt" aria-pressed="false">County</button>
-            <button class="radio-opt" aria-pressed="false">State</button>
-          </div>
-        </div>
-        <div>
-          <div class="control-group-label">Color Scale</div>
-          <div class="legend-bar" role="img" aria-label="Gradient from blue (lower burden) to orange (higher burden)"></div>
-          <div class="legend-labels" aria-hidden="true"><span>Lower burden</span><span>Higher burden</span></div>
-        </div>
-        <div>
-          <div class="control-group-label" id="ctrl-bar">Bar Height</div>
-          <div class="radio-list" role="group" aria-labelledby="ctrl-bar">
-            <button class="radio-opt sel" aria-pressed="true">Max detection (ppt)</button>
-            <button class="radio-opt" aria-pressed="false">Sum of detections</button>
-            <button class="radio-opt" aria-pressed="false">Detection count</button>
-          </div>
-        </div>
+        <button type="button" class="map-fs-btn" id="map-fs-btn" aria-label="Toggle fullscreen">&#10530; Fullscreen</button>
+        <iframe id="map-frame" title="Interactive PFAS and Environmental Justice map"
+                src="web/map.html"
+                style="width:100%;height:100%;border:0;display:block;"
+                allow="fullscreen"></iframe>
       </div>
     </div>
 
     <div class="info-row">
       <div class="info-cell">
         <div class="info-cell-label">Reading the map</div>
-        <p>Each unit shaded by chosen demographic variable. 3D bars encode PFAS contamination simultaneously — darker orange rising high marks the most burdened communities.</p>
+        <p>Each <strong class="term" tabindex="0" data-def="ZIP Code Tabulation Area: a Census geography that approximates ZIP code areas for demographic analysis.">ZCTA</strong> is shaded by the chosen demographic variable. The <strong class="term" tabindex="0" data-def="Vertical map columns whose height represents the average PFAS concentration for a place.">3D bar</strong> encodes mean PFAS concentration for that ZCTA and reporting period.</p>
       </div>
       <div class="info-cell">
         <div class="info-cell-label">Data pipeline</div>
-        <p>EPA ECHO measurements spatially joined to ACS geometries. Filtered to confirmed detections in public water systems, aggregated to the selected geographic unit.</p>
+        <p>EPA PFAS Analytic Tools and <strong class="term" tabindex="0" data-def="Unregulated Contaminant Monitoring Rule: an EPA program that tests public water systems for emerging contaminants.">UCMR-5</strong> records are filtered to readings at or above each analyte's <strong class="term" tabindex="0" data-def="The lowest concentration a laboratory can reliably measure and report.">Minimum Reporting Level</strong>, joined through <strong class="term" tabindex="0" data-def="A lookup table that connects USPS ZIP codes to Census ZIP Code Tabulation Areas.">ZIP-to-ZCTA crosswalks</strong>, and paired with <strong class="term" tabindex="0" data-def="American Community Survey: Census Bureau data on demographics, housing, and socioeconomic conditions.">ACS</strong> 5-year estimates.</p>
       </div>
       <div class="info-cell">
-        <div class="info-cell-label">Redundant encoding</div>
-        <p>Color and bar height are two independent signals — so colorblind users can read contamination levels from height alone without relying on hue.</p>
+        <div class="info-cell-label">Limitations</div>
+        <p>Testing coverage is uneven. Large <strong class="term" tabindex="0" data-def="A utility or organization that provides drinking water to the public.">public water systems</strong> are favored, private wells are often excluded, and under-monitored rural or lower-income areas may appear artificially clean.</p>
       </div>
     </div>
   </section>
@@ -960,10 +1266,25 @@
       </div>
       <div class="section-right">
         <h2>Data &amp; Analysis</h2>
-        <p>A guided walkthrough pairing a timeline of PFAS spread with interactive exploratory
-        visualizations — scatter plots, detection trends, and demographic breakdowns that surface
-        the patterns underlying contamination data.</p>
+        <p>A guided record of how contamination data is retrieved, joined, filtered, and interpreted.
+        This section pairs visual analysis with the limitations and ethical concerns that shape what
+        the data can and cannot claim.</p>
       </div>
+    </div>
+
+    <div class="text-stack">
+      <details class="full-text" open>
+        <summary>Methods</summary>
+        <p>Our pipeline retrieves PFAS measurements directly from the EPA's PFAS Analytic Tools, which surface the Unregulated Contaminants in Drinking Water Monitoring Rule (UCMR)-5 drinking water testing data for public water systems, and filters to readings at or above each analyte's Minimum Reporting Level (MRL), which is the threshold below which the laboratory cannot reliably confirm the concentration detected. Because UCMR reports the ZIP codes a water system serves while the American Community Survey (ACS) census data are published for ZIP Code Tabulation Areas (ZCTAs), we apply a ZIP-to-ZCTA crosswalk to join each contamination record to its ZCTA geography and ACS 5-year estimates, and aggregate to a mean PFAS concentration per ZCTA, per reporting period. The resulting dataset is keyed on ZCTA and each row captures the sample date/reporting period, the ZCTA identifier, its geo-polygon boundary data, a set of demographic and socioeconomic variables (race/ethnicity concentration, median household income, etc.) and the mean concentration. This builds The Map, where each geo-polygon is shaded by the selected demographic variable and a 3D bar encodes mean contamination in its height and color, and The Record, where this processed dataset is used to drive further analysis and insights on the timeline and extent of PFAS contamination.</p>
+      </details>
+      <details class="full-text">
+        <summary>Data Limitations</summary>
+        <p>Several limitations follow from this design and inform how The Map and The Record should be read. Most fundamentally, differences across ZCTAs reflect not just contamination but where testing happened. Specifically, UCMR's monitoring thresholds favor large public water systems and often exclude private wells entirely. Furthermore, coverage is uneven, so under-monitored areas which often skew rural and lower-income, can appear artificially clean. Because this missingness correlates with the very demographics we study, we treat "not tested" as a distinct category rather than just a low (or an absence of a) value. Finally, the ZIP-served field is not a precise service area because a system may occasionally serve only part of a listed ZIP, so the ZCTA join is an approximation and not a measure of individual exposure.</p>
+      </details>
+      <details class="full-text">
+        <summary>Ethical Considerations</summary>
+        <p>Beyond technical limitations and practices for our project, there are also ethical considerations we need to account for. Data visualization compresses individuals and their different stories into an aggregate that sometimes obscures human context behind the numbers. That is part of the reason why we have added a story highlight section to our narrative analysis. Our hope is that by highlighting these stories that cover a wide range of contexts within the scope of PFAS contamination and environmental justice, we can surface some of the context that aggregating numbers tend to neglect. Still, there are stories and communities who are impacted in the same way that we fail to highlight and account for. In terms of data feminism, our choices of dataset, visualizations, and even the stories we highlighted ultimately influence how our audience views PFAS contamination in this given context (Rezai par. 11). We have made every effort to present multiple narratives and handle situations where we have limited data. Although there exists a gap between our project and the underlying story for these communities, by addressing that this gap exists we hope to give the audience a general understanding of some of the frameworks relevant to digital humanities and the potential extensions to our project. Our positionality also contributes to that gap: we are essentially outsiders looking in on these stories and working with public datasets built on data and methodologies predetermined by institutions. We did not make decisions on the underlying data itself, only the visualizations and analysis built on top of it. These are the ethical considerations we hope the reader carries with them as they engage with our project.</p>
+      </details>
     </div>
 
     <div class="viz-row">
@@ -990,13 +1311,13 @@
           </div>
         </div>
         <figcaption class="viz-summary">
-          Expected finding: census tracts with higher proportions of people of color show elevated PFAS detection levels — consistent with environmental justice literature on disproportionate contamination burden.
+          A 2023 Harvard study by Jahred Liddie and collaborators found higher PFAS levels in predominantly Black and Latino communities, linked partly to nearby industrial buildings, military sites, and airports.
         </figcaption>
       </figure>
 
       <figure class="viz-cell">
         <div class="viz-cell-header">
-          <span class="viz-cell-title">PFAS Detections Over Time (2016–2024)</span>
+          <span class="viz-cell-title">PFAS Detections by Reporting Period</span>
           <span class="viz-cell-type">Bar Chart</span>
         </div>
         <div class="viz-area" role="img" aria-label="Bar chart showing PFAS detections rising sharply from 2016 to 2024, from blue to orange encoding temporal progression.">
@@ -1016,7 +1337,7 @@
           </div>
         </div>
         <figcaption class="viz-summary">
-          Detection counts have risen sharply since 2016, reflecting both expanded testing requirements and wider contamination spread. Steepest increases follow the PFAS Strategic Roadmap (2022).
+          The project reads time trends cautiously: rising detections can reflect expanded monitoring as well as contamination, while untested places remain analytically distinct from low-contamination places.
         </figcaption>
       </figure>
     </div>
@@ -1027,40 +1348,40 @@
           <span class="viz-cell-title">Contamination by Income Quartile</span>
           <span class="viz-cell-type">Box Plot</span>
         </div>
-        <div class="viz-area"><span>Visualization coming soon</span></div>
-        <figcaption class="viz-summary">Will show median and spread of PFAS detection levels across four income quartiles, testing whether lower-income tracts face systematically higher contamination.</figcaption>
+        <div class="viz-area"><span>Income comparison in progress</span></div>
+        <figcaption class="viz-summary">Compares mean PFAS concentrations across income groupings while foregrounding how under-monitoring can hide burdens in lower-income communities.</figcaption>
       </figure>
 
       <figure class="viz-cell">
         <div class="viz-cell-header">
-          <span class="viz-cell-title">SVI Composite Score vs. Max PFAS Detection</span>
+          <span class="viz-cell-title">SVI Composite Score vs. Mean PFAS Concentration</span>
           <span class="viz-cell-type">Regression</span>
         </div>
-        <div class="viz-area"><span>Visualization coming soon</span></div>
-        <figcaption class="viz-summary">Will plot CDC SVI scores against maximum PFAS detection, with a regression line testing whether social vulnerability predicts contamination exposure.</figcaption>
+        <div class="viz-area"><span>SVI comparison in progress</span></div>
+        <figcaption class="viz-summary">Pairs CDC Social Vulnerability Index scores with mean PFAS concentration to examine whether contamination intersects with community vulnerability.</figcaption>
       </figure>
     </div>
 
     <div class="tl-wrap">
-      <div class="tl-label">Regulatory Timeline</div>
+      <div class="tl-label">Project Timeline &amp; Case Anchors</div>
       <dl class="tl-items">
-        <dt class="tl-year">1940s</dt>
-        <dd class="tl-content"><strong>Industrial synthesis begins</strong><p>3M develops PFOS; DuPont patents PTFE (Teflon). Widespread manufacturing adoption. Early internal toxicity data suppressed from public and regulators.</p></dd>
-
-        <dt class="tl-year">1998</dt>
-        <dd class="tl-content"><strong>Internal evidence shared with EPA</strong><p>3M data reveals PFOS accumulates in human blood globally. No public disclosure follows. Voluntary phase-out negotiated years later — no enforcement.</p></dd>
-
-        <dt class="tl-year hot">2001–06</dt>
-        <dd class="tl-content"><strong>C8 Health Project, Parkersburg WV</strong><p>DuPont's Teflon plant linked to elevated cancer rates in surrounding community. Predominantly low-income and rural. Class-action settlement with no admission of liability.</p></dd>
+        <dt class="tl-year">1997</dt>
+        <dd class="tl-content"><strong>3M internal blood testing</strong><p>Kris Hansen's work for 3M found PFOS in blood bank samples across the country, revealing that contamination had already become widespread.</p></dd>
 
         <dt class="tl-year hot">2016</dt>
-        <dd class="tl-content"><strong>First EPA health advisory — non-binding</strong><p>Lifetime advisory set at 70 ppt combined PFOA+PFOS. Voluntary only. No enforcement mechanism. Communities with contaminated systems receive no legal recourse.</p></dd>
+        <dd class="tl-content"><strong>Newburgh, New York</strong><p>New York found PFOS contamination in Washington Lake near Newburgh, with the source traced to Stewart Air National Guard Base.</p></dd>
 
-        <dt class="tl-year">2022</dt>
-        <dd class="tl-content"><strong>PFAS Strategic Roadmap</strong><p>EPA commits to binding Maximum Contaminant Levels. Decades of advocacy from contaminated communities precede this commitment.</p></dd>
+        <dt class="tl-year">2020</dt>
+        <dd class="tl-content"><strong>Marinette, Wisconsin</strong><p>Residents near a fire training facility were notified after years of PFAS exposure, then advised against blood tests despite community health concerns.</p></dd>
 
-        <dt class="tl-year hot">2024</dt>
-        <dd class="tl-content"><strong>First federal MCL established</strong><p>EPA sets MCL at 4 ppt for PFOA and PFOS — 80 years after these compounds entered widespread production. Compliance required by 2029.</p></dd>
+        <dt class="tl-year">2023</dt>
+        <dd class="tl-content"><strong>National sociodemographic study</strong><p>Liddie et al. published national evidence connecting PFAS sources and detections with community demographics in US public water systems.</p></dd>
+
+        <dt class="tl-year hot">2023</dt>
+        <dd class="tl-content"><strong>Industry documents analysis</strong><p>Gaber et al. examined DuPont and 3M documents showing that corporate labs identified PFAS toxicity decades before public disclosure.</p></dd>
+
+        <dt class="tl-year hot">2025</dt>
+        <dd class="tl-content"><strong>Hoosick Falls accountability story</strong><p>Michael Hickey's community testing helped expose PFAS contamination after local authorities declined to test the water.</p></dd>
       </dl>
     </div>
 
@@ -1068,17 +1389,17 @@
       <div class="source-cell">
         <div class="source-org">EPA · ECHO</div>
         <div class="source-name">PFAS Analytic Tools</div>
-        <p class="source-desc">Live contamination measurements from public water systems nationwide. Basis for all PFAS exposure variables in this analysis.</p>
+        <p class="source-desc">Primary contamination source for the project, including public water system testing records surfaced through the EPA's PFAS Analytic Tools.</p>
       </div>
       <div class="source-cell">
         <div class="source-org">U.S. Census Bureau</div>
         <div class="source-name">ACS 5-Year Estimates, 2020–2024</div>
-        <p class="source-desc">Demographic estimates at census tract level: race, income, poverty, age structure, rurality. Joined geographically to water system service areas.</p>
+        <p class="source-desc">ACS 5-year estimates provide demographic and socioeconomic variables, including race, income, and age structure, joined to ZCTA geography.</p>
       </div>
       <div class="source-cell">
         <div class="source-org">CDC / ATSDR</div>
         <div class="source-name">Social Vulnerability Index, 2022</div>
-        <p class="source-desc">Composite burden indices across four themes: socioeconomic status, household characteristics, racial/ethnic minority status, and housing type.</p>
+        <p class="source-desc">The Social Vulnerability Index helps identify communities facing greater disadvantage in responding to environmental harms.</p>
       </div>
     </div>
   </section>
@@ -1092,64 +1413,82 @@
       </div>
       <div class="section-right">
         <h2>Human &amp; Community Impact</h2>
-        <p>Quantitative patterns placed in human context. Integrating toxicological research,
-        community testimony, and the social history of regulatory neglect to trace who decided
-        which communities would carry this burden — and how that decision was made.</p>
+        <p>Quantitative patterns placed in human context. These stories trace contamination
+        in marginalized communities, corporate concealment, institutional negligence, and
+        accountability failures that data alone cannot fully capture.</p>
       </div>
     </div>
 
     <div class="pull-quote">
-      <blockquote>"The question is not whether PFAS is dangerous — the science settled that decades ago. The question is why some communities waited 80 years for the government to act, while the industry that profited faced no accountability."</blockquote>
-      <cite>Framing premise for this section</cite>
+      <blockquote>"These stories, along with our data visualizations, illuminate the human decisions and power dynamics behind the environmental crisis of PFAS contamination."</blockquote>
+      <cite>Project narrative analysis</cite>
+    </div>
+
+    <div class="text-stack">
+      <details class="full-text" open>
+        <summary>Narrative Analysis</summary>
+        <p>A 2023 Harvard study published one of the first national studies on PFAS in drinking water. Testing from eight thousand community water systems across the US, researcher Jahred Liddie and his team found that communities that were predominantly Black and Latino saw higher levels of PFAS concentration (Liddie et al.). The cause of this phenomenon was shown to be a result of industrial buildings, military plants, and airports near the communities' water systems. The research suggests that these facilities were disproportionately clustered near communities of color, targeting communities with the least amount of power to act against these decisions in society. Furthermore, the states that were included in the study were ones who had sufficient monitoring data to reach these conclusions. There are many similar situations across the country where marginalized communities, lacking political and economic power to challenge these decisions, are targeted. The full extent of PFAS likely exceeds what current studies document, and that gap is one of the main motivations behind this project.</p>
+        <p>Thus, the following case studies intend to trace patterns of PFAS contamination that may not be fully captured through data analysis. From accounts of contamination in low-income and non-white communities to corporate concealment and institutional negligence, these stories-along with our data visualizations-illuminate the human decisions and power dynamics behind the environmental crisis of PFAS contamination.</p>
+        <p>Liddie, Jahred M, et al. "Sociodemographic Factors Are Associated with the Abundance of PFAS Sources and Detection in U.S. Community Water Systems." ACS Publications, vol. 57, no. 21, 30 May 2023, pp. 7902-7912, https://doi.org/10.1021/acs.est.2c07255. Accessed 29 June 2026.</p>
+        <p>Staff Writer. "Communities of Color Disproportionately Exposed to PFAS Pollution in Drinking Water." Harvard T.H. Chan School of Public Health, 15 May 2023, https://hsph.harvard.edu/news/communities-of-color-disproportionately-exposed-to-pfas-pollution-in-drinking-water/. Accessed 29 June 2026.</p>
+      </details>
     </div>
 
     <div class="story-grid">
-      <article class="story-card">
-        <div class="story-img img-b" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+      <article class="story-card story-active" data-story-title="Visualizing Burden">
         <div class="story-body">
-          <p class="story-tag">Toxicology</p>
-          <h3>What PFAS Does to the Body</h3>
-          <p>A synthesis of epidemiological research on health outcomes: kidney and testicular cancer, thyroid disruption, immunotoxicity, and developmental impacts in children.</p>
+          <p class="story-tag">Visualizing Burden</p>
+          <h3>Newburgh, New York</h3>
+          <p>In 2016, New York discovered PFOS contamination in Washington Lake near Newburgh and traced the source to Stewart Air National Guard Base. Residents near the area reported PFOS blood concentrations five times the average after likely consuming contaminated water for decades.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-burden">Read more</button>
+          <div class="story-expanded" id="story-burden">
+            <p>Newburgh is a majority Latino and Black city facing economic marginalization. Similar to the Harvard study discussed above, this case shows how PFAS exposure can follow existing lines of racial and economic inequality.</p>
+            <p>The pattern identified by Liddie and collaborators appears to repeat nationally: marginalized communities are impacted by decisions made around them and for them, often before they are given the information or resources needed to protect themselves.</p>
+            <p>This connects to the project's environmental justice framework because Newburgh residents lacked a meaningful opportunity to prevent PFAS exposure before the damage was done. The case helps turn the map's aggregate patterns into a human story about uneven power, delayed disclosure, and unequal protection.</p>
+            <p class="story-source">Source: Shantal Riley, "The New York Water Crisis That Nobody's Talking About," VICE, 21 Jan. 2020.</p>
+          </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+      <article class="story-card" data-story-title="Visualizing Cost">
         <div class="story-body">
-          <p class="story-tag">Community</p>
-          <h3>Parkersburg, WV: The Original PFAS Town</h3>
-          <p>Where DuPont dumped PFOA into groundwater for decades. A working-class community bore health consequences while corporate knowledge was buried inside proprietary research.</p>
+          <p class="story-tag">Visualizing Cost</p>
+          <h3>3M, DuPont, and Withheld Knowledge</h3>
+          <p>In 1997, Kris Hansen was hired by 3M to investigate PFOS. Her tests on blood bank samples showed that PFOS was already widespread, while internal records revealed that 3M had known about harmful consequences and had hidden reports and studies.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-cost">Read more</button>
+          <div class="story-expanded" id="story-cost">
+            <p>This story reveals the intention and causation behind the PFAS crisis. Contamination from PFAS was not simply accidental; it was shaped by companies and organizations prioritizing efficiency, liability management, and cost over public health.</p>
+            <p>Those with power, including those with early knowledge of contamination, were able to externalize risk onto communities with far less ability to fight back. In the context of this project, the question of who decides these consequences points to a structure that allows harm to continue at the expense of people with less institutional power.</p>
+            <p>The pattern extends beyond 3M. A 2023 study of documents from DuPont and 3M found that both companies' laboratories identified PFAS toxicity decades before that information was publicly declared. Through a data feminism lens, this is a clear example of how data can carry the interests and goals of its creators. Company research was produced, withheld, and structured in ways that protected the companies rather than the public.</p>
+            <p class="story-source">Sources: Nadia Gaber et al., "The Devil They Knew," Annals of Global Health, 2023; Sharon Lerner, ProPublica, 2024.</p>
+          </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-c" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+      <article class="story-card" data-story-title="Visualizing Negligence">
         <div class="story-body">
-          <p class="story-tag">Regulatory History</p>
-          <h3>The Decades-Long Regulatory Gap</h3>
-          <p>Industry lobbying, voluntary agreements, and EPA inaction left communities — disproportionately communities of color — without enforceable protections for a generation.</p>
+          <p class="story-tag">Visualizing Negligence</p>
+          <h3>Marinette, Wisconsin</h3>
+          <p>Residents near a fire training facility in Marinette were exposed to PFAS contamination for years before being notified by Arcadis, a consulting firm hired to investigate water sources. When residents sought answers, authorities advised against blood tests, citing the lack of effective treatments.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-negligence">Read more</button>
+          <div class="story-expanded" id="story-negligence">
+            <p>Residents were left with the results of years of contamination, unexplained illnesses, and a system that knew there were problems but did not solve them. This reveals another layer of PFAS harm: the damage is not only physical, but institutional.</p>
+            <p>Stories like Marinette, where a gap exists between institutional knowledge and public disclosure, are exactly what this project aims to make visible. Under an intersectional feminist framework focused on environmental justice, data visualizations need to be paired with narratives about institutional neglect.</p>
+            <p>That pairing helps the audience see how people with power and resources can remain indifferent to hidden struggles in affected communities.</p>
+            <p class="story-source">Source: Thomas W. Pearson, "Communities Grapple With Exposure to 'Forever Chemicals,'" SAPIENS, 31 July 2020.</p>
+          </div>
         </div>
       </article>
-      <article class="story-card">
-        <div class="story-img img-a" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
+      <article class="story-card" data-story-title="Visualizing Accountability">
         <div class="story-body">
-          <p class="story-tag">Military Communities</p>
-          <h3>AFFF Contamination Near Military Bases</h3>
-          <p>Aqueous film-forming foam used at installations saturated surrounding groundwater — often low-income communities of color with little political leverage.</p>
-        </div>
-      </article>
-      <article class="story-card">
-        <div class="story-img img-b" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
-        <div class="story-body">
-          <p class="story-tag">Rural Exposure</p>
-          <h3>Small Systems, Fewer Resources</h3>
-          <p>Rural water systems frequently lack capital and staffing to detect and remediate PFAS — placing rural residents in compound vulnerability with no recourse.</p>
-        </div>
-      </article>
-      <article class="story-card">
-        <div class="story-img img-c" aria-hidden="true"><span class="story-img-label">Image placeholder</span></div>
-        <div class="story-body">
-          <p class="story-tag">Policy</p>
-          <h3>What the 2024 MCL Changes (and Doesn't)</h3>
-          <p>The first federal standard arrived 80 years after contamination began. What it covers, what it excludes, and which communities still have no recourse.</p>
+          <p class="story-tag">Visualizing Accountability</p>
+          <h3>Hoosick Falls, New York</h3>
+          <p>After his father died of kidney cancer, Michael Hickey noticed illness patterns in Hoosick Falls and tested the water himself after local authorities declined to do so. The testing revealed PFAS contamination tied to a local manufacturing plant.</p>
+          <button class="read-more-btn" type="button" aria-expanded="false" aria-controls="story-accountability">Read more</button>
+          <div class="story-expanded" id="story-accountability">
+            <p>Settlements were eventually issued to residents, but the lives lost were permanent consequences of neglect. The fact that a resident could test the water himself shows that one of the central problems around PFAS contamination is accountability.</p>
+            <p>Institutions had the responsibility and capacity to act, yet community members were forced to fill the gap. This is just one example of how an unaccountable system, which decides residents' fate for them, can leave lasting impacts on the communities it is meant to serve.</p>
+            <p>From a data feminism perspective, Hickey's work also illuminates the labor behind exposing the PFAS crisis. The responsibility to collect, test, and present data ethically fell to the community that public institutions were supposed to protect. This case asks who has to do the work of making harm visible when official systems fail.</p>
+            <p class="story-source">Source: William Brangham, "How a Small Community Fought for Justice After Finding Forever Chemicals in Drinking Water," PBS NewsHour, 13 Nov. 2025.</p>
+          </div>
         </div>
       </article>
     </div>
@@ -1164,34 +1503,36 @@
       </div>
       <div class="section-right">
         <h2>Project Members &amp; Progress</h2>
-        <p>Six contributors across three project components. All members are responsible for tracking work progress published on this documentation log.</p>
+        <p>Six contributors worked across research, data processing, website development,
+        interactive mapping, timeline analysis, and visualizations. This section also includes
+        the project's annotated bibliography and glossary.</p>
       </div>
     </div>
 
     <div class="team-grid">
       <div class="team-cell">
         <div class="avatar-initial" aria-hidden="true">A</div>
-        <div><div class="team-name">Aadil</div><div class="team-role">Map Design &amp; Development</div><span class="comp-tag">The Map</span></div>
+        <div><div class="team-name">Aadil Jamari</div><div class="team-role">Implemented the data retrieval and preprocessing pipeline, and designed the interactive 3D map.</div><span class="comp-tag">The Map</span></div>
       </div>
       <div class="team-cell">
         <div class="avatar-initial" aria-hidden="true">J</div>
-        <div><div class="team-name">Julia</div><div class="team-role">Map Design &amp; Development</div><span class="comp-tag">The Map</span></div>
+        <div><div class="team-name">Julia Shvartsman</div><div class="team-role">Created the website and UI, including visualization tools and interactive components.</div><span class="comp-tag">Website / UI</span></div>
       </div>
       <div class="team-cell">
         <div class="avatar-initial" aria-hidden="true">S</div>
-        <div><div class="team-name">Sophia Ma</div><div class="team-role">Data Narrative &amp; Analysis</div><span class="comp-tag">The Record</span></div>
+        <div><div class="team-name">Sophia Ma</div><div class="team-role">Conducted exploratory data analysis and created interactive visualizations that reveal important trends.</div><span class="comp-tag">The Record</span></div>
       </div>
       <div class="team-cell">
         <div class="avatar-initial" aria-hidden="true">P</div>
-        <div><div class="team-name">Paulina</div><div class="team-role">Data Narrative &amp; Analysis</div><span class="comp-tag">The Record</span></div>
+        <div><div class="team-name">Paulina Garcia</div><div class="team-role">Contributed to the interactive timeline and descriptive plots, and investigated underlying patterns in the data.</div><span class="comp-tag">The Record</span></div>
       </div>
       <div class="team-cell">
         <div class="avatar-initial orange" aria-hidden="true">E</div>
-        <div><div class="team-name">Ethan</div><div class="team-role">Human &amp; Community Impact</div><span class="comp-tag orange">The Stories</span></div>
+        <div><div class="team-name">Ethan Lin</div><div class="team-role">Gathered research and stories on PFAS contamination and environmental justice; wrote parts of the narratives and annotated bibliography.</div><span class="comp-tag orange">The Stories</span></div>
       </div>
       <div class="team-cell">
         <div class="avatar-initial orange" aria-hidden="true">O</div>
-        <div><div class="team-name">Owen</div><div class="team-role">Human &amp; Community Impact</div><span class="comp-tag orange">The Stories</span></div>
+        <div><div class="team-name">Owen Song</div><div class="team-role">Gathered DH, project, and news sources; wrote parts of the introduction, framework analysis, and annotated bibliography.</div><span class="comp-tag orange">Research</span></div>
       </div>
     </div>
 
@@ -1207,15 +1548,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>Data acquisition — EPA PFAS measurements</td><td>All</td><td>Data</td><td><span class="chip chip-done">Done</span></td></tr>
-          <tr><td>ACS demographic data pull &amp; cleaning</td><td>All</td><td>Data</td><td><span class="chip chip-done">Done</span></td></tr>
-          <tr><td>Geographic join (PFAS → census tracts)</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-progress">In Progress</span></td></tr>
-          <tr><td>deck.gl 3D map implementation</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-planned">Planned</span></td></tr>
-          <tr><td>Choropleth layer + controls UI</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-planned">Planned</span></td></tr>
-          <tr><td>Exploratory scatter plots &amp; trend charts</td><td>Sophia, Paulina</td><td>Analysis</td><td><span class="chip chip-progress">In Progress</span></td></tr>
-          <tr><td>PFAS timeline &amp; regulatory history</td><td>Sophia, Paulina</td><td>Analysis</td><td><span class="chip chip-progress">In Progress</span></td></tr>
-          <tr><td>Toxicology synthesis &amp; community profiles</td><td>Ethan, Owen</td><td>Stories</td><td><span class="chip chip-planned">Planned</span></td></tr>
-          <tr><td>Narrative writing &amp; editorial review</td><td>Ethan, Owen</td><td>Stories</td><td><span class="chip chip-planned">Planned</span></td></tr>
+          <tr><td>EPA PFAS Analytic Tools and UCMR-5 retrieval</td><td>Aadil</td><td>Data Pipeline</td><td><span class="chip chip-done">Done</span></td></tr>
+          <tr><td>ZIP-to-ZCTA crosswalk and ACS join</td><td>Aadil, Julia</td><td>Map</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>Interactive 3D map and website UI</td><td>Julia, Aadil</td><td>Website / Map</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>Timeline and descriptive PFAS plots</td><td>Paulina, Sophia</td><td>The Record</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>Exploratory data analysis and interactive visualizations</td><td>Sophia</td><td>The Record</td><td><span class="chip chip-progress">In Progress</span></td></tr>
+          <tr><td>Environmental justice narratives and case studies</td><td>Ethan, Owen</td><td>The Stories</td><td><span class="chip chip-done">Done</span></td></tr>
+          <tr><td>Introduction, framework analysis, and annotated bibliography</td><td>Ethan, Owen</td><td>Research</td><td><span class="chip chip-done">Done</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1224,11 +1563,46 @@
       <div class="rq-label">Research Question</div>
       <p class="rq-text">
         <em>Who bears the burden of PFAS contamination in America,</em>
-        and who decided they would? Examined through the intersection of race,
-        class, rurality, and the structural history of regulatory inaction —
-        grounded in Bullard (1990) and the environmental justice tradition.
+        and who decided they would? Examined through race, class, age structure,
+        rurality, regulatory power, corporate concealment, and environmental justice.
       </p>
     </div>
+
+    <div class="bibliography" aria-label="Annotated bibliography">
+      <div class="log-header-row"><span class="log-title">Annotated Bibliography</span></div>
+      <article class="bib-entry"><strong>Bullard, Robert D. <em>Dumping in Dixie: Race, Class, and Environmental Quality.</em> Westview Press, 1990.</strong><p>A foundational environmental justice text documenting environmental contamination in predominantly Black communities in the Deep South and grounding this project's analysis of race, class, and environmental risk.</p></article>
+      <article class="bib-entry"><strong>EJAtlas: Global Atlas of Environmental Justice. Environmental Justice Atlas. Accessed 25 June 2026.</strong><p>A digital humanities model for mapping environmental justice stories geographically, useful for thinking about interactive maps and case narratives together.</p></article>
+      <article class="bib-entry"><strong>"Environmental Data Justice." Technoscience Research Unit. Accessed 25 June 2026.</strong><p>A University of Toronto research project showing how maps, community stories, and pollution reports can connect environmental data with colonialism, marginalization, and community context.</p></article>
+      <article class="bib-entry"><strong>Hepworth, Katherine, and Christopher Church. "Racism in the Machine." <em>Digital Humanities Quarterly</em>, 2018.</strong><p>A peer-reviewed framework for ethical data visualization, especially when working with bias-laden data and racialized harm.</p></article>
+      <article class="bib-entry"><strong>Rezai, Yasamin. "Data Stories for/from All: Why Data Feminism Is for Everyone." <em>Digital Humanities Quarterly</em>, 2022.</strong><p>Supports the project's use of data feminism to make power, labor, methodological choices, and inequality visible.</p></article>
+      <article class="bib-entry"><strong>United Nations Development Programme. "Environmental Justice."</strong><p>Provides general principles of environmental justice, including accountability, environmental rights, and the environmental rule of law.</p></article>
+      <article class="bib-entry"><strong>U.S. Census Bureau. American Community Survey 5-year estimates, 2020-2024. Retrieved 25 June 2026.</strong><p>Provides demographic variables such as race, income, and age used to contextualize contamination at the community level.</p></article>
+      <article class="bib-entry"><strong>U.S. Environmental Protection Agency. PFAS Analytic Tools. Retrieved 25 June 2026.</strong><p>The project's primary contamination source, used to identify PFAS testing and reporting patterns in public water systems.</p></article>
+      <article class="bib-entry"><strong>CDC/ATSDR. Social Vulnerability Index 2022 database: United States. Retrieved 20 June 2026.</strong><p>Provides a standard measure of social vulnerability across economic status, housing, and quality-of-life indicators.</p></article>
+      <article class="bib-entry"><strong>Williams, Sarah C. P. "PFAS, aka 'Forever Chemicals': What the Science Says." Stanford Medicine, 25 July 2024.</strong><p>A concise scientific overview of PFAS persistence, health risks, and regulatory efforts.</p></article>
+    </div>
+
+    <dl class="glossary-grid" aria-label="Glossary">
+      <div class="log-header-row" style="grid-column:1/-1"><span class="log-title">Glossary</span></div>
+      <div class="glossary-term"><dt>PFAS</dt><dd>An extensive family of synthetic fluorocarbons linked to immunity deficiency, cancer, birth defects, and hepatic and kidney disease.</dd></div>
+      <div class="glossary-term"><dt>PFOS</dt><dd>A PFAS historically used in firefighting foams and stain repellents, linked to immune, developmental, and thyroid harms.</dd></div>
+      <div class="glossary-term"><dt>UCMR</dt><dd>An EPA program requiring public water system testing every five years to monitor emerging drinking water pollutants.</dd></div>
+      <div class="glossary-term"><dt>ZCTA</dt><dd>A Census Bureau statistical geography used to approximate ZIP code areas for demographic analysis.</dd></div>
+      <div class="glossary-term"><dt>Minimum Reporting Level</dt><dd>The lowest concentration a laboratory can reliably measure and report using an analytical method.</dd></div>
+      <div class="glossary-term"><dt>American Community Survey</dt><dd>A Census Bureau survey program collecting socioeconomic, housing, and demographic data.</dd></div>
+      <div class="glossary-term"><dt>CDC Social Vulnerability Index</dt><dd>A metric evaluating community resilience to external stressors using Census variables.</dd></div>
+      <div class="glossary-term"><dt>Environmental Justice</dt><dd>The principle that all people have the right to safe, healthy environments and fair environmental governance.</dd></div>
+      <div class="glossary-term"><dt>Environmental Racism</dt><dd>The disproportionate exposure of marginalized racial groups and communities to environmental hazards.</dd></div>
+      <div class="glossary-term"><dt>Critical Race Theory</dt><dd>An academic framework examining how race and racism are embedded in institutions and laws.</dd></div>
+      <div class="glossary-term"><dt>Intersectional Feminism</dt><dd>A framework examining how overlapping identities shape experiences of oppression and discrimination.</dd></div>
+      <div class="glossary-term"><dt>Bioaccumulation</dt><dd>The gradual buildup of toxic substances within an organism over time.</dd></div>
+      <div class="glossary-term"><dt>Public Water System</dt><dd>A utility or organization that provides drinking water to the public.</dd></div>
+      <div class="glossary-term"><dt>Missingness</dt><dd>The condition of values being absent from a dataset.</dd></div>
+      <div class="glossary-term"><dt>Geo-polygon</dt><dd>A closed geographic region represented by latitude and longitude coordinates.</dd></div>
+      <div class="glossary-term"><dt>Positionality</dt><dd>The social and political context that shapes a person's identity, perspective, and worldview.</dd></div>
+      <div class="glossary-term"><dt>ZIP-to-ZCTA Crosswalk</dt><dd>A tool that maps USPS ZIP codes to Census ZIP Code Tabulation Areas.</dd></div>
+      <div class="glossary-term"><dt>Data Feminism</dt><dd>An approach to data science that applies intersectional feminist theory to data collection, analysis, and interpretation.</dd></div>
+    </dl>
   </section>
 
 </main>
@@ -1255,16 +1629,54 @@
     if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); e.preventDefault(); }
   });
 
-  document.querySelectorAll('.radio-list').forEach(list => {
-    list.querySelectorAll('.radio-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        list.querySelectorAll('.radio-opt').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
-        btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
-      });
+  const storyCards = [...document.querySelectorAll('.story-card')];
+  let activeStoryIndex = 0;
+
+  function setStorySpotlight(index) {
+    if (!storyCards.length) return;
+    activeStoryIndex = (index + storyCards.length) % storyCards.length;
+    storyCards.forEach((card, i) => card.classList.toggle('story-active', i === activeStoryIndex));
+  }
+
+  setStorySpotlight(0);
+  window.setInterval(() => {
+    if (!document.querySelector('.story-card.expanded')) setStorySpotlight(activeStoryIndex + 1);
+  }, 5200);
+
+  document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.story-card');
+      const expanded = card.classList.toggle('expanded');
+      btn.setAttribute('aria-expanded', String(expanded));
+      btn.firstChild.textContent = expanded ? 'Show less' : 'Read more';
+      const index = storyCards.indexOf(card);
+      if (index !== -1) setStorySpotlight(index);
     });
   });
 
-  // ── US MAP via D3 + real TopoJSON ──────────────────────────────
+  // The map is a self-contained page (web/map.html) with its own controls.
+  // Manage only the initial loader and the fullscreen toggle here.
+  const mapFrame = document.getElementById('map-frame');
+  if (mapFrame) {
+    const mapShell = mapFrame.closest('.map-placeholder');
+    mapFrame.addEventListener('load', () => {
+      window.setTimeout(() => mapShell && mapShell.classList.remove('loading'), 140);
+    });
+  }
+  const mapFsBtn = document.getElementById('map-fs-btn');
+  if (mapFsBtn) {
+    mapFsBtn.addEventListener('click', () => {
+      const el = document.getElementById('map-shell');
+      if (!el) return;
+      if (!document.fullscreenElement) {
+        (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  }
+
+    // ── US MAP via D3 + real TopoJSON ──────────────────────────────
   // Fetches the actual US state boundaries from us-atlas and renders
   // them with an Albers USA projection — the standard for US thematic maps.
   (async function renderUSMap() {
@@ -1304,16 +1716,12 @@
         .attr('class', 'us-nation')
         .attr('d', path);
 
-      // Contamination hotspot markers — approximate lat/lon for known PFAS clusters
-      // These are real approximate locations: midwest industrial, NC/SC, Great Lakes
+      // Contamination markers for case-study locations discussed in the narrative.
       const hotspots = [
-        { name: 'Ohio/Indiana (3M industrial)',  coords: [-84.5, 39.8],  color: '#e0724a', r: 3.5 },
-        { name: 'NC/SC (Chemours/GenX)',          coords: [-78.9, 34.5],  color: '#e0724a', r: 3   },
-        { name: 'Cape Fear, NC',                  coords: [-78.2, 35.1],  color: '#e0724a', r: 2.5 },
-        { name: 'Great Lakes region',             coords: [-86.2, 42.0],  color: '#e0724a', r: 2.5 },
-        { name: 'Parkersburg, WV (DuPont)',       coords: [-81.6, 39.3],  color: '#e0724a', r: 4   },
-        { name: 'Colorado Springs (AFFF)',        coords: [-104.8, 38.8], color: '#4a7de0', r: 2.5 },
-        { name: 'New England (manufacturing)',    coords: [-71.5, 42.4],  color: '#e0724a', r: 2   },
+        { name: 'Newburgh, NY',          coords: [-74.0, 41.5],  color: '#e0724a', r: 3.5 },
+        { name: 'Hoosick Falls, NY',     coords: [-73.4, 42.9],  color: '#e0724a', r: 3   },
+        { name: 'Marinette, WI',         coords: [-87.6, 45.1],  color: '#e0724a', r: 3   },
+        { name: 'Parkersburg, WV',       coords: [-81.6, 39.3],  color: '#e0724a', r: 3.5 },
       ];
 
       hotspots.forEach(({ coords, color, r }) => {

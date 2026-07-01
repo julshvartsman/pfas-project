@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PFAS × Environmental Justice — Map</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/deck.gl@9.0.35/dist.min.js"></script>
+<script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+<style>
+  :root{--bg:#0c0d10;--surface:#13151a;--border:#232630;--border-2:#2e3240;
+        --text:#e4e6ed;--text-2:#9a9db0;--text-sub:#7a7d92;--blue:#4a7de0;--orange:#e0724a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+  .layout{display:grid;grid-template-columns:1fr 258px;height:100vh;}
+  #map{position:relative;height:100vh;background:#0a0e18;}
+  .sidebar{background:var(--surface);border-left:1px solid var(--border);padding:1.05rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem;}
+  .panel-title{font-size:.95rem;font-weight:700;color:var(--text);padding-bottom:.6rem;border-bottom:1px solid var(--border-2);}
+  .ctrl-section{display:flex;flex-direction:column;gap:1.05rem;padding:.9rem;border:1px solid var(--border);border-radius:7px;background:#0f1116;}
+  .section-head{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding-left:.5rem;border-left:2px solid;}
+  .sh-analysis{color:var(--blue);border-color:var(--blue);}
+  .sh-display{color:var(--orange);border-color:var(--orange);}
+  .group-label{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-sub);margin-bottom:.5rem;}
+  .radio-list{display:flex;flex-direction:column;gap:.2rem;}
+  .radio-opt{all:unset;cursor:pointer;font-size:.76rem;color:var(--text-sub);padding:.3rem .5rem;border-radius:2px;display:flex;align-items:center;gap:.5rem;}
+  .radio-opt::before{content:'';width:5px;height:5px;border-radius:50%;border:1.5px solid var(--border-2);flex-shrink:0;}
+  .radio-opt:hover{color:var(--text-2);}
+  .radio-opt.sel{color:var(--text);}
+  .radio-opt.sel::before{background:var(--blue);border-color:var(--blue);}
+  select{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border-2);border-radius:3px;padding:.35rem .4rem;font-size:.76rem;font-family:inherit;}
+  .legend-bar{height:6px;border-radius:1px;margin:.4rem 0 .3rem;}
+  .legend-labels{display:flex;justify-content:space-between;font-size:.68rem;color:var(--text-sub);}
+  .legend-row{display:flex;align-items:center;gap:.5rem;font-size:.68rem;color:var(--text-sub);margin-top:.4rem;}
+  .legend-swatch{width:11px;height:11px;border-radius:2px;flex-shrink:0;}
+  .slider-val{font-size:.78rem;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:.35rem;}
+  input[type=range]{width:100%;accent-color:var(--orange);}
+  label.chk{display:flex;align-items:center;gap:.5rem;font-size:.76rem;color:var(--text-2);cursor:pointer;}
+  .note{font-size:.68rem;color:var(--text-sub);line-height:1.5;}
+  #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-2);font-size:.85rem;z-index:5;}
+  .deck-tooltip{font-size:.72rem!important;white-space:pre-line;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div id="map"><div id="loading">Loading map data…</div></div>
+  <aside class="sidebar">
+    <div class="panel-title">Map Controls</div>
+
+    <section class="ctrl-section">
+      <div class="section-head sh-analysis">Data &amp; Analysis</div>
+      <div><div class="group-label">Choropleth Variable</div><div class="radio-list" id="var-list"></div></div>
+      <div>
+        <div class="group-label">Map Layers</div>
+        <div class="radio-list" id="mode-list">
+          <button class="radio-opt sel" data-mode="both">Choropleth + bars</button>
+          <button class="radio-opt" data-mode="choropleth">Choropleth only</button>
+          <button class="radio-opt" data-mode="bars">Bars only</button>
+        </div>
+      </div>
+      <div>
+        <div class="group-label">Month</div>
+        <div class="slider-val" id="month-label">All-time</div>
+        <input type="range" id="month-slider" min="0" max="0" value="0" step="1" />
+      </div>
+    </section>
+
+    <section class="ctrl-section">
+      <div class="section-head sh-display">Display &amp; Appearance</div>
+      <div><div class="group-label">Color Map</div><select id="cmap-select"></select></div>
+      <div><div class="group-label">No-Data Color</div><select id="na-select"></select></div>
+      <div>
+        <div class="group-label">Context Outlines</div>
+        <label class="chk"><input type="checkbox" id="chk-zcta" checked /> All ZCTA boundaries</label>
+        <label class="chk"><input type="checkbox" id="chk-county" checked /> County boundaries</label>
+      </div>
+      <div>
+        <div class="group-label">Max Bar Height</div>
+        <div class="slider-val" id="height-label">180 km</div>
+        <input type="range" id="height-slider" min="40000" max="500000" value="180000" step="10000" />
+      </div>
+      <div>
+        <div class="group-label">Bar Width</div>
+        <div class="slider-val" id="width-label">1.5 km</div>
+        <input type="range" id="width-slider" min="200" max="8000" value="1500" step="100" />
+      </div>
+      <div>
+        <div class="group-label">Color Scale</div>
+        <div class="legend-bar" id="legend-bar"></div>
+        <div class="legend-labels"><span>Lower</span><span>Higher</span></div>
+        <div class="legend-row"><span class="legend-swatch" id="na-swatch"></span> No data (never sampled / missing)</div>
+      </div>
+    </section>
+
+    <div class="note">Bars: mean PFAS (ng/L) per ZCTA. Red rings mark the highest demographic × PFAS overlap. Drag to pan, Ctrl/⌘-drag to tilt &amp; rotate.</div>
+  </aside>
+</div>
+
+<script>
+const DATA_DIR = "";
+const HOTSPOTS = 12, HILITE = [170, 90, 235, 235];
+const LABELS = {total_pop:"Total population", median_hh_income:"Median household income ($)",
+  pct_below_poverty:"% below poverty", pct_nonwhite:"% people of color", pct_hispanic:"% Hispanic",
+  pct_black_nh:"% Black", pct_asian_nh:"% Asian", pop_density:"Population density (/sq mi)"};
+const COLORMAPS = {
+  "Blue → Orange": [[74,125,224],[150,150,170],[224,114,74]],
+  "Viridis":       [[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],
+  "Magma":         [[0,0,4],[81,18,124],[183,55,121],[252,137,97],[252,253,191]],
+  "Grayscale":     [[235,235,235],[20,20,20]]
+};
+// user-selectable colour for ZCTAs with no data (never sampled or missing demographic)
+const NA_COLORS = {
+  "Grey":       [120,120,130],
+  "Dark slate": [64,64,72],
+  "Blue-grey":  [70,90,110],
+  "Pink":       [230,175,200],
+};
+
+let GEO, VALUES, META, COUNTIES, ZCTA_ALL, deckgl;
+const STATE = {var:"pct_nonwhite", mode:"both", month:"all", cmap:"Blue → Orange",
+               naColor:"Grey", elevMax:180000, radius:1500, showZcta:true, showCounty:true, hover:null};
+
+const varLabel = v => (META && META.labels && META.labels[v]) || LABELS[v] || v;
+const naRGB = () => NA_COLORS[STATE.naColor];
+
+// ---- color + scale helpers ----
+const clamp01 = t => Math.max(0, Math.min(1, t));
+const lerp = (a,b,t) => a + (b-a)*t;
+function ramp(t){
+  const stops = COLORMAPS[STATE.cmap]; t = clamp01(t);
+  const n = stops.length-1, x = t*n, i = Math.min(Math.floor(x), n-1), f = x-i;
+  const a = stops[i], b = stops[i+1];
+  return [0,1,2].map(k => Math.round(lerp(a[k], b[k], f)));
+}
+function quantile(sorted,q){
+  if(!sorted.length) return NaN;
+  const pos=(sorted.length-1)*q, base=Math.floor(pos), rest=pos-base;
+  return sorted[base+1]!==undefined ? sorted[base]+rest*(sorted[base+1]-sorted[base]) : sorted[base];
+}
+function makeNorm(vals){
+  const s=vals.filter(v=>v!=null && !isNaN(v)).sort((a,b)=>a-b);
+  const lo=quantile(s,0.05), hi=quantile(s,0.95), span=(hi>lo)?(hi-lo):1;
+  return v => (v==null||isNaN(v)) ? null : clamp01((v-lo)/span);
+}
+const fmt = v => (v==null||isNaN(v)) ? "n/a" : Number(v).toLocaleString(undefined,{maximumFractionDigits:1});
+
+// ---- per-view data ----
+function computeChoroFill(){
+  const v=STATE.var, na=naRGB();
+  const nf=makeNorm(GEO.features.map(f=>{const r=VALUES[f.properties.zcta]; return r?r[v]:null;}));
+  for(const f of GEO.features){
+    const r=VALUES[f.properties.zcta], t=nf(r?r[v]:null);
+    f.properties.__fill = (t==null) ? na.concat([190]) : ramp(t).concat([190]);
+  }
+}
+function buildColumns(){
+  const mkey=STATE.month, rows=[];
+  for(const f of GEO.features){
+    const z=f.properties.zcta, r=VALUES[z]; if(!r) continue;
+    const mm=r.months[mkey]; if(!mm || mm.mean==null || mm.mean<=0) continue;   // skip clean (0) bars
+    rows.push({zcta:z, lon:r.lon, lat:r.lat, mean:mm.mean, dem:r[STATE.var]});
+  }
+  const nf=makeNorm(rows.map(d=>d.mean)), nd=makeNorm(rows.map(d=>d.dem));
+  for(const d of rows){
+    const pn=nf(d.mean)??0;
+    d.baseColor=ramp(pn).concat([230]); d.elev=pn*STATE.elevMax; d.score=(nd(d.dem)??0)*pn;
+  }
+  return rows;
+}
+
+function buildLayers(){
+  computeChoroFill();
+  const cols=buildColumns();
+  const na=naRGB();
+  const layers=[];
+  // all-ZCTA base: outlines for every ZCTA + no-data fill; fill only under a choropleth. Pickable.
+  if(ZCTA_ALL && STATE.showZcta){
+    layers.push(new deck.GeoJsonLayer({
+      id:"zcta-all", data:ZCTA_ALL, stroked:true, filled:true,
+      getFillColor:f => (STATE.mode!=="bars" && !VALUES[f.properties.zcta]) ? na.concat([175]) : [0,0,0,0],
+      getLineColor:[140,140,155,80], lineWidthMinPixels:0.3, pickable:true,
+      updateTriggers:{getFillColor:[STATE.mode, STATE.naColor]}
+    }));
+  }
+  if(COUNTIES && STATE.showCounty){
+    layers.push(new deck.GeoJsonLayer({
+      id:"counties", data:COUNTIES, stroked:true, filled:false,
+      getLineColor:[105,105,122,150], lineWidthMinPixels:0.5, pickable:false
+    }));
+  }
+  if(STATE.mode==="both" || STATE.mode==="choropleth"){
+    layers.push(new deck.GeoJsonLayer({
+      id:"choropleth", data:GEO, stroked:true, filled:true, extruded:false,
+      getFillColor:f => f.properties.zcta===STATE.hover ? HILITE : f.properties.__fill,
+      getLineColor:[60,60,70], lineWidthMinPixels:0.3, pickable:true,
+      updateTriggers:{getFillColor:[STATE.var, STATE.cmap, STATE.naColor, STATE.hover]}
+    }));
+  }
+  if(STATE.mode==="both" || STATE.mode==="bars"){
+    layers.push(new deck.ColumnLayer({
+      id:"bars", data:cols, diskResolution:12, radius:STATE.radius, extruded:true, elevationScale:1,
+      getPosition:d=>[d.lon,d.lat],
+      getFillColor:d => d.zcta===STATE.hover ? HILITE : d.baseColor,
+      getElevation:d=>d.elev, pickable:true,
+      updateTriggers:{getElevation:[STATE.month,STATE.elevMax], getFillColor:[STATE.month,STATE.cmap,STATE.hover]}
+    }));
+  }
+  const hot=[...cols].sort((a,b)=>b.score-a.score).slice(0,HOTSPOTS);
+  layers.push(new deck.ScatterplotLayer({
+    id:"halos", data:hot, getPosition:d=>[d.lon,d.lat],
+    filled:true, stroked:true, getFillColor:[255,190,200,210], getLineColor:[210,20,20,230],
+    lineWidthMinPixels:2.5, radiusMinPixels:16, radiusMaxPixels:16, pickable:false
+  }));
+  return layers;
+}
+function render(){ deckgl.setProps({layers:buildLayers()}); }
+
+function getTooltip({object}){
+  if(!object) return null;
+  const z = object.properties ? object.properties.zcta : object.zcta;
+  if(!z) return null;
+  const dlab = varLabel(STATE.var);
+  const r = VALUES[z];
+  if(!r){   // never sampled — only the all-ZCTA layer has this polygon
+    return {text: `ZCTA ${z} — Unknown\n${dlab}: Data Missing\nPFAS mean: Never sampled`};
+  }
+  const mm = r.months[STATE.month] || r.months["all"] || {};
+  const place = r.city ? ` — ${r.city}${r.state? ", "+r.state : ""}` : "";
+  const demv = r[STATE.var];
+  const lines = [
+    `ZCTA ${z}${place}`,
+    `${dlab}: ${demv==null ? "Data Missing" : fmt(demv)}`,
+    `PFAS mean: ${mm.mean==null ? "Never sampled" : fmt(mm.mean)+" ng/L"}`
+  ];
+  if(r.rurality) lines.push(`Rurality: ${r.rurality}`);
+  if(mm.pws){ const p=mm.pws.split(";").map(s=>s.trim()).filter(Boolean);
+    lines.push("Systems: "+p.slice(0,3).join("; ")+(p.length>3?` +${p.length-3} more`:"")); }
+  return {text: lines.join("\n")};
+}
+
+// linked hover: one hovered ZCTA highlights in BOTH the choropleth and the bar
+function onHover(info){
+  const z = info.object ? (info.object.properties ? info.object.properties.zcta : info.object.zcta) : null;
+  if(z !== STATE.hover){ STATE.hover = z; render(); }
+}
+
+// ---- controls ----
+function legendGradient(){
+  const stops=COLORMAPS[STATE.cmap];
+  const css=stops.map((c,i)=>`rgb(${c[0]},${c[1]},${c[2]}) ${Math.round(i/(stops.length-1)*100)}%`).join(",");
+  document.getElementById("legend-bar").style.background=`linear-gradient(90deg,${css})`;
+  const na=naRGB();
+  document.getElementById("na-swatch").style.background=`rgb(${na[0]},${na[1]},${na[2]})`;
+}
+function setSel(list,btn){ list.querySelectorAll(".radio-opt").forEach(b=>b.classList.remove("sel")); btn.classList.add("sel"); }
+function fillSelect(id, names, current, onpick){
+  const el=document.getElementById(id);
+  names.forEach(name=>{ const o=document.createElement("option"); o.value=name; o.textContent=name;
+    if(name===current) o.selected=true; el.appendChild(o); });
+  el.onchange=()=>onpick(el.value);
+}
+function buildControls(){
+  const vl=document.getElementById("var-list");
+  META.acs_vars.forEach(v=>{
+    const b=document.createElement("button");
+    b.className="radio-opt"+(v===STATE.var?" sel":""); b.textContent=varLabel(v);
+    b.onclick=()=>{ setSel(vl,b); STATE.var=v; render(); };
+    vl.appendChild(b);
+  });
+  fillSelect("cmap-select", Object.keys(COLORMAPS), STATE.cmap,
+             val => { STATE.cmap=val; legendGradient(); render(); });
+  fillSelect("na-select", Object.keys(NA_COLORS), STATE.naColor,
+             val => { STATE.naColor=val; legendGradient(); render(); });
+  const ml=document.getElementById("mode-list");
+  ml.querySelectorAll(".radio-opt").forEach(b=> b.onclick=()=>{ setSel(ml,b); STATE.mode=b.dataset.mode; render(); });
+  document.getElementById("chk-zcta").onchange   = e => { STATE.showZcta = e.target.checked; render(); };
+  document.getElementById("chk-county").onchange = e => { STATE.showCounty = e.target.checked; render(); };
+  const ms=document.getElementById("month-slider"), mlbl=document.getElementById("month-label");
+  ms.max=META.months.length-1; ms.value=0;
+  ms.oninput=()=>{ const m=META.months[+ms.value]; STATE.month=m; mlbl.textContent=(m==="all"?"All-time":m); render(); };
+  const hs=document.getElementById("height-slider"), hlbl=document.getElementById("height-label");
+  hs.value=STATE.elevMax;
+  hs.oninput=()=>{ STATE.elevMax=+hs.value; hlbl.textContent=Math.round(STATE.elevMax/1000)+" km"; render(); };
+  const ws=document.getElementById("width-slider"), wlbl=document.getElementById("width-label");
+  ws.value=STATE.radius;
+  ws.oninput=()=>{ STATE.radius=+ws.value; wlbl.textContent=(STATE.radius/1000).toFixed(1)+" km"; render(); };
+  legendGradient();
+}
+
+// ---- boot ----
+async function init(){
+  const [topo, values, meta] = await Promise.all([
+    fetch(DATA_DIR+"zcta.topojson").then(r=>r.json()),
+    fetch(DATA_DIR+"values.json").then(r=>r.json()),
+    fetch(DATA_DIR+"meta.json").then(r=>r.json())
+  ]);
+  GEO = topojson.feature(topo, topo.objects.zctas);
+  VALUES = values; META = meta;
+  if(!META.acs_vars.includes(STATE.var)) STATE.var = META.acs_vars[0];
+
+  // all-ZCTA polygons (exported once from the notebook, carrying the zcta code) — non-fatal if missing
+  try{
+    const ta = await fetch(DATA_DIR+"zcta_all.topojson").then(r=>r.json());
+    ZCTA_ALL = topojson.feature(ta, ta.objects.zcta_all);   // FeatureCollection w/ properties.zcta
+  }catch(e){ console.warn("all-ZCTA layer unavailable (run the notebook export cell):", e); ZCTA_ALL=null; }
+
+  // county outline from CDN — non-fatal if missing
+  try{
+    const us = await fetch("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json").then(r=>r.json());
+    COUNTIES = {type:"Feature", geometry: topojson.mesh(us, us.objects.counties, (a,b)=>a!==b), properties:{}};
+  }catch(e){ console.warn("county outlines unavailable:", e); COUNTIES=null; }
+
+  deckgl = new deck.DeckGL({
+    container:"map", map:maplibregl,
+    mapStyle:"https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+    initialViewState:{longitude:-98.5, latitude:39.5, zoom:3.4, pitch:30, bearing:0},
+    controller:true, getTooltip, onHover, layers:[]
+  });
+  buildControls();
+  render();
+  document.getElementById("loading").remove();
+}
+init().catch(e=>{ document.getElementById("loading").textContent="Error loading data: "+e.message; console.error(e); });
+</script>
+</body>
+</html>

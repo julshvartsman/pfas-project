@@ -3,3 +3,6 @@ pandas
 numpy
 requests
 pyarrow
+pydeck
+geopandas
+topojson
