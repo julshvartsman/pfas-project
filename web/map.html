@@ -232,7 +232,6 @@ function getTooltip({object}){
     `${dlab}: ${demv==null ? "Data Missing" : fmt(demv)}`,
     `PFAS mean: ${mm.mean==null ? "Never sampled" : fmt(mm.mean)+" ng/L"}`
   ];
-  if(r.rurality) lines.push(`Rurality: ${r.rurality}`);
   if(mm.pws){ const p=mm.pws.split(";").map(s=>s.trim()).filter(Boolean);
     lines.push("Systems: "+p.slice(0,3).join("; ")+(p.length>3?` +${p.length-3} more`:"")); }
   return {text: lines.join("\n")};
